@@ -1,12 +1,12 @@
-# tensor.nn
-Machine learning toolbox for educational purposes
+# Fusion
+Fusion of different Machine learning tools
 
-### Objectives
+## Objectives
 Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a Tensor class based on numpy.
 
 ---
 
-### todo
+## todo
 
 - [ ] create a machine learning framework.
 	- [ ] Tensor class / Automatic differentiation
