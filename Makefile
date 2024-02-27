@@ -5,7 +5,7 @@ PYTHON = ${BIN}/python3
 PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
-PROGRAM =
+PROGRAM = simple_operation.py
 
 # ARGUMENTS =
 
@@ -20,7 +20,7 @@ pip_upgrade:
 
 install: \
 	requirements \
-	module \
+	# module \
 #
 module: setup.py
 	${PIP} install -e . --upgrade
