@@ -9,9 +9,9 @@ from numpy._typing import NDArray
 
 # will start with add and multiply
 class Tensor:
-    def __init__(self, ndarray: NDArray, _children=(), _operation=''):
+    def __init__(self, ndarray: NDArray, _children=(), _operation=None):
         self.ndarray = ndarray
-        self._parents = set(_children)
+        self._previous = set(_children)
         # how can i zero_grad ?
         # i need to match shape for gradient i think
         self.gradient = 0
@@ -52,4 +52,4 @@ class Tensor:
             node._backward()
 
     def __repr__(self) -> str:
-        return f'numpy array: {self.ndarray}\ngradient: {self.gradient}, shape: {self._shape}, operation: {self._operation}'
+        return f'[Tensor(shape={self._shape}, operation={self._operation}]'
