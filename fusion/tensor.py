@@ -4,35 +4,21 @@
 #         self.parents = parents
 #         self.operation = operation
 
-# implement require gradient only in the case of training and backprog
-# not nescessary with only inference
 
-# will start with add and multiply
-# i need to decompose data in the class
-# we can moove the data as a memoryview()
-# and display the data with numpy
-# class should only stored what is nescessary to accomplish the backprog
-# the class describe how the backprog should work
-
-# data can be of multiple type / in 
-
-# type will decide what operation we have to do
-# shape
-# created
-#       operation that created it
-# create
+from typing import Tuple, Union
 
 import numpy as np
 from numpy import dtype
-from typing import Tuple, Union
 
 default_type=np.float32
 
 class Tensor:
     def __init__(self, data: Union[int, float, list, np.ndarray], _children=(), _operation=None):
+        # True for training / False for inference
         self.need_gradient : bool = True
-        # how can i zero_grad ?
-        # i need to match shape for gradient i think
+
+        # to zero_grad
+        # we create a copy in shape of the tensor and zeroed all the value
         # self.gradient = Tensor(0)
         self.gradient = 0
 
@@ -64,6 +50,7 @@ class Tensor:
     # def dtype(self) -> dtype: return np.dtype(self.ndata)
 
     def numpy(self) -> np.ndarray: return self.ndata
+    # def numpy(self) -> np.ndarray: return self.lazydata.numpy()
 
     # define topological sort and then apply the _backward for each element in reversed
     # def backward(self):
@@ -81,7 +68,9 @@ class Tensor:
 
     def backward(self):
 
-        # The first gradient is always 1.
+        # The first gradient should always be 1.
+        # And a scalar value / Loss calculated : 0.80 something
+        # in a tensor and backpropagate to the biggest shape() of inputs X
         self.gradient = 1
         # self.gradient = Tensor(1)
 
