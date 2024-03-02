@@ -17,11 +17,6 @@ class Tensor:
         # True for training / False for inference
         self.need_gradient : bool = True
 
-        # to zero_grad
-        # we create a copy in shape of the tensor and zeroed all the value
-        # self.gradient = Tensor(0)
-        self.gradient = 0
-
         # Context: internal variables used for autograd graph construction
         # maybe create a new class for this
         self._parents = set(_children)
@@ -40,6 +35,12 @@ class Tensor:
         if isinstance(data, np.ndarray):
             self.ndata = data
             return
+
+        # to zero_grad
+        # we create a copy in shape of the tensor and zeroed all the value
+        # self.gradient = Tensor(0)
+        # self.gradient = 0
+        # self.gradient = np.zeros_like(self.ndata)
 
     # @property is just a getter() | in our case it gets the shape()
     @property
@@ -71,8 +72,10 @@ class Tensor:
         # The first gradient should always be 1.
         # And a scalar value / Loss calculated : 0.80 something
         # in a tensor and backpropagate to the biggest shape() of inputs X
-        self.gradient = 1
+        # self.gradient = 1
+        # self.gradient = 1
         # self.gradient = Tensor(1)
+        self.gradient = np.ones_like(self.ndata)
 
         # self.topological_sort()
         # topological_sort(self)
@@ -82,6 +85,13 @@ class Tensor:
             # print(node, "\n")
             node._backward()
             # self.gradient = node._backward()
+
+    def sum(self):
+        output = Tensor(self.ndata.sum(), (self, ), 'sum')
+        def _backward():
+            self.gradient += output.gradient
+        output._backward = _backward
+        return output
 
     def __add__(self, other):
         output = Tensor(self.ndata + other.ndata, (self, other), '+')

@@ -14,7 +14,11 @@ matrice_2 = Tensor(t)
 matrice_3 = matrice_1 + matrice_2
 # matrice_4 = matrice_3 + matrice_2
 
-z = y + x
+# z = y + x
+print(x.shape)
+z = x.sum()
+print(z)
+print(z.shape)
 z.backward()
 
 print(z)
