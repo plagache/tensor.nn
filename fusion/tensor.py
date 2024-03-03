@@ -5,17 +5,30 @@
 #         self.operation = operation
 
 
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from numpy import dtype
 
 default_type=np.float32
 
+# it has a Function and a tensor
+# Tensor has the data and the shape
+# Function take a variables number of Tensor and describe the forward and backward pass
+# Forward create context attach to Tensors / parents / ops
+# Backward describe how the gradient is populated
+
+
 class Tensor:
     def __init__(self, data: Union[int, float, list, np.ndarray], _children=(), _operation=None):
         # True for training / False for inference
         self.need_gradient : bool = True
+
+        # to zero_grad
+        # we create a copy in shape of the tensor and zeroed all the value
+        self.gradient = Optional[Tensor]
+        # self.gradient = 0
+        # self.gradient = np.zeros_like(self.ndata)
 
         # Context: internal variables used for autograd graph construction
         # maybe create a new class for this
@@ -36,11 +49,6 @@ class Tensor:
             self.ndata = data
             return
 
-        # to zero_grad
-        # we create a copy in shape of the tensor and zeroed all the value
-        # self.gradient = Tensor(0)
-        # self.gradient = 0
-        # self.gradient = np.zeros_like(self.ndata)
 
     # @property is just a getter() | in our case it gets the shape()
     @property
