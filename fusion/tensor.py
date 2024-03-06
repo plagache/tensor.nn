@@ -1,4 +1,6 @@
-from typing import Optional, Tuple, Union
+from __future__ import annotations
+
+from typing import Optional, Tuple, Type, Union
 
 import numpy as np
 from numpy import dtype
@@ -23,15 +25,15 @@ class Function:
     # @classmethod provides a way to define methods that operate on the class itself rather than instances of the class.
     # The apply method is used to instantiate and execute the forward pass of the function, returning a tensor representing the result.
     @classmethod
-    def apply(function:Type[Function], *x:Tensor, **kwargs):
-        context = function(*x)
-        output = Tensor(context.forward, *x, **kwargs)
+    def apply(cls:Type[Function], *x:Tensor, **kwargs):
+        context = cls(*x)
+        output = Tensor(context.forward(*x, **kwargs))
         output._context = context
         return output
 
 class Add(Function):
     def forward(self, x, y):
-        return x + y
+        return np.add(x, y)
     def backward(self, output):
         return output, output
 
@@ -104,7 +106,8 @@ class Tensor:
         for node in reversed(self.topological_sort()):
             node.gradient = node.backward()
 
-    # def __add__(self, other):
+    def __add__(self, other):
+        return Add.apply(self, other)
 
 
     def __repr__(self) -> str:
