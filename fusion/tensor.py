@@ -20,37 +20,40 @@ class Function:
 
     # *args = positional arguments
     # **kwargs = keyword arguments
-    def forward(self, *args, **kwargs):
+    def forward(self, *args):
         raise NotImplementedError("forward not implemented")
 
-    def backward(self, *args, **kwargs):
+    def backward(self, *args):
         raise NotImplementedError("backward not implemented")
 
     # @classmethod provides a way to define methods that operate on the class itself rather than instances of the class.
     # The apply method is used to instantiate and execute the forward pass of the function, returning a tensor representing the result.
     @classmethod
-    def apply(cls: Type[Function], *x: Tensor, **kwargs):
-        context = cls(*x)
-        output = Tensor(context.forward(*x, **kwargs))
+    def apply(function: Type[Function], *x: Tensor):
+        context = function(*x)
+        output = Tensor(context.forward(*x))
+        print(context)
+        print(output)
         output._context = context
         return output
 
 
 class Add(Function):
-    def forward(self, x, y):
-        return np.add(x, y)
+    def forward(self, x: Tensor, y: Tensor):
+        return np.add(x.ndata, y.ndata)
 
-    def backward(self, output):
+    def backward(self, output: Tensor):
         return output, output
 
 
 class Sum(Function):
-    def forward(self, x):
+    def forward(self, x: Tensor):
         self.input_shape = x.shape
-        return x.sum()
+        print(np.sum(x.ndata))
+        return np.sum(x.ndata)
 
-    def backward(self, output):
-        return np.broadcast_to(output, self.input_shape)
+    def backward(self, output: Tensor):
+        return np.broadcast_to(output.ndata, self.input_shape)
 
 
 class Tensor:
@@ -114,8 +117,18 @@ class Tensor:
         for node in reversed(self.topological_sort()):
             node.gradient = node.backward()
 
-    def __add__(self, other):
+    def add(self, other):
+        # print(self, "in Tensor")
         return Add.apply(self, other)
+
+    def __add__(self, other):
+        return self.add(other)
+
+    def sum(self):
+        return Sum.apply(self)
+
+    def __sum__(self):
+        return self.sum()
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None
