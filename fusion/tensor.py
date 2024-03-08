@@ -32,8 +32,7 @@ class Function:
     def apply(function: Type[Function], *x: Tensor):
         context = function(*x)
         output = Tensor(context.forward(*x))
-        print(context)
-        print(output)
+        # print(context)
         output._context = context
         return output
 
@@ -49,7 +48,6 @@ class Add(Function):
 class Sum(Function):
     def forward(self, x: Tensor):
         self.input_shape = x.shape
-        print(np.sum(x.ndata))
         return np.sum(x.ndata)
 
     def backward(self, output: Tensor):
@@ -69,11 +67,7 @@ class Tensor:
         # _ mean private context
         self._context: Optional[Function] = None
 
-        if isinstance(data, (int, float)):
-            self.ndata = np.array(data)
-            return
-
-        if isinstance(data, list):
+        if isinstance(data, (int, float, np.integer, list)):
             self.ndata = np.array(data)
             return
 
@@ -98,11 +92,12 @@ class Tensor:
     def topological_sort(self):
         def _topological_sort(node, node_visited, graph_sorted):
             if node not in node_visited:
-                node_visited.add(node)
-                for parent in node._context.parents:
-                    _topological_sort(parent, node_visited, graph_sorted)
-                    # yield / is for lazy, and yield the data
-                graph_sorted.append(node)
+                if getattr(node, "_context", None):
+                    node_visited.add(node)
+                    for parent in node._context.parents:
+                        _topological_sort(parent, node_visited, graph_sorted)
+                        # yield / is for lazy, and yield the data
+                    graph_sorted.append(node)
             return graph_sorted
 
         return _topological_sort(self, set(), [])
@@ -113,9 +108,23 @@ class Tensor:
         self.gradient = Tensor(1)
 
         # for each node we want te create a Parents Tensor Gradients
-        print(reversed(self.topological_sort()))
+        # print("\nTopo sort:", self.topological_sort())
+        # print("\nself:", self)
+        # print("\nself.gradient:", self.gradient)
         for node in reversed(self.topological_sort()):
-            node.gradient = node.backward()
+            assert node.gradient is not None
+            for parents in node._context.parents:
+                # print("\nbefore backward:", parents.gradient)
+                parents.gradient = node._context.backward(node.gradient)
+                # print("\nafter backward:", parents.gradient)
+
+            # print("node:", node)
+            # print("node.gradient", node.gradient)
+            # node.gradient = node._context.backward(node.gradient)
+            # print("node:", node)
+            # print("grad:", node.gradient)
+            # del node._context
+        return self
 
     def add(self, other):
         # print(self, "in Tensor")
@@ -127,11 +136,11 @@ class Tensor:
     def sum(self):
         return Sum.apply(self)
 
-    def __sum__(self):
-        return self.sum()
+    # def __sum__(self):
+    #     return self.sum()
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None
         # return f'[Tensor(shape={self.ndata.shape}, operation={self._operation}]'
         # we do not store operation on the Tensor: its in Function
-        return f"<Tensor(ndata={self.ndata}>"
+        return f"<Tensor(ndata={self.ndata})>"

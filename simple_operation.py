@@ -6,11 +6,24 @@ from fusion import Tensor
 m = 3
 t = np.random.rand(m, m).astype(np.float32)
 
-x = Tensor([[1,1,0],[1,0,1],[0,1,1]])
-y = Tensor([[0,1,0],[0,0,1],[1,1,0]])
+x = Tensor([[1,1,0,2],[1,0,1,5],[0,1,1,9]])
+y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]])
 
-# z = x + y
+b = x + y
 # print(z)
-z = x.sum()
-print(z.shape)
-# z.backward()
+z = b.sum()
+# print(x.ndata)
+# print(y.ndata)
+# print(z.ndata)
+# print(z.ndata)
+# print(z.shape)
+# print(b._context)
+# print(z._context)
+z.backward()
+print("z.gradient", z.gradient)
+print("b.gradient", b.gradient)
+print("x.gradient", x.gradient)
+print("y.gradient", y.gradient)
+# print(np.array(1))
+# print(b.gradient)
+# print(x.gradient)
