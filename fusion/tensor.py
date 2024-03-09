@@ -32,7 +32,6 @@ class Function:
     def apply(function: Type[Function], *x: Tensor):
         context = function(*x)
         output = Tensor(context.forward(*x))
-        # print(context)
         output._context = context
         return output
 
@@ -110,24 +109,29 @@ class Tensor:
         # for each node we want te create a Parents Tensor Gradients
         # print("\nTopo sort:", self.topological_sort())
         # print("\nself:", self)
+        # print("\nbefore Backward =================")
         # print("\nself.gradient:", self.gradient)
         for node in reversed(self.topological_sort()):
             assert node.gradient is not None
+            print("\n=============== New Node =================")
             for parents in node._context.parents:
-                # print("\nbefore backward:", parents.gradient)
-                parents.gradient = node._context.backward(node.gradient)
-                # print("\nafter backward:", parents.gradient)
-
-            # print("node:", node)
-            # print("node.gradient", node.gradient)
-            # node.gradient = node._context.backward(node.gradient)
-            # print("node:", node)
-            # print("grad:", node.gradient)
-            # del node._context
+                # print(f"parents len:{len(node._context.parents)}")
+                # print(f"parents: {parents}")
+                print(f"node: {node}\ngradient: {node.gradient}\ncontexte: {node._context}\nbackward: {node._context.backward(node.gradient)}\nEnd ==================")
+                gradients = node._context.backward(node.gradient)
+                # print(f"gradients:{gradients}")
+                # gradients = [Tensor(gradients)]
+                if len(node._context.parents) == 1:
+                    parents.gradient = gradients
+                else:
+                    for parent, gradient in zip(parents, gradients):
+                        assert gradient.shape == parent.shape, f"grad shape must match tensor shape, {gradient.shape!r} != {parent.shape!r}"
+                        parent.gradient = gradient
+                # we have multiple parents and need to match backward result with shape
+            del node._context
         return self
 
     def add(self, other):
-        # print(self, "in Tensor")
         return Add.apply(self, other)
 
     def __add__(self, other):
@@ -141,6 +145,6 @@ class Tensor:
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None
-        # return f'[Tensor(shape={self.ndata.shape}, operation={self._operation}]'
+        # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
         return f"<Tensor(ndata={self.ndata})>"
