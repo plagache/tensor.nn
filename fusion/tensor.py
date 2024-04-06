@@ -28,22 +28,35 @@ class Function:
 
     # @classmethod provides a way to define methods that operate on the class itself rather than instances of the class.
     # The apply method is used to instantiate and execute the forward pass of the function, returning a tensor representing the result.
+    # context = Type[Function] that create this result: Add / Sum / Mul
     @classmethod
-    def apply(function: Type[Function], *x: Tensor):
-        context = function(*x)
+    def apply(cls: Type[Function], *x: Tensor):
+        context = cls(*x)
         output = Tensor(context.forward(*x))
         output._context = context
         return output
 
+# Binary ops, 2 Tensor same size, no broadcast, use expands
+class Mul(Function):
+    def forward(self, x: Tensor, y: Tensor):
+        return np.multiply(x.ndata, y.ndata)
 
+    def backward(self, output: Tensor):
+        return output.ndata * self.parents[1].ndata, output.ndata * self.parents[0].ndata
+
+# Binary ops, 2 Tensor same size, no broadcast, use expands
 class Add(Function):
     def forward(self, x: Tensor, y: Tensor):
         return np.add(x.ndata, y.ndata)
 
     def backward(self, output: Tensor):
-        return output, output
+        return output.ndata, output.ndata
 
+# Movement ops, modify size of Tensor
 
+# Unary ops, One input, return one Tensor, exemple: EXP
+
+# Reduce ops, 1 tensor, return scalar value
 class Sum(Function):
     def forward(self, x: Tensor):
         self.input_shape = x.shape
@@ -54,11 +67,15 @@ class Sum(Function):
 
 
 class Tensor:
-    def __init__(self, data: Union[int, float, list, np.ndarray]):
-        # True for training / False for inference
-        self.need_gradient: bool = True
+    # https://wiki.python.org/moin/UsingSlots
+    # slots are more efficient in terms of memory space and speed of access, and a bit safer than the default Python method of data access
+    # __slots__ = "ndata", "need_gradient", "gradient", "_context"
 
-        # to zero_grad / maybe we don't need / we should just assume zero is always the case
+    def __init__(self, data: Union[int, float, list, np.ndarray], need_gradient: Optional[bool] = None):
+        # True for parameters training / False for inference / inputs / labels
+        self.need_gradient: Optional[bool] = need_gradient
+
+        # for the zero_grad we set to None the value of gradients and we can use the None to do operation like
         # we create a copy in shape of the tensor and zeroed all the value
         self.gradient: Optional[Tensor] = None
 
@@ -104,36 +121,31 @@ class Tensor:
     # Create new Tensor at each node with the gradients
     def backward(self):
         # First gradient is always one
-        self.gradient = Tensor(1)
+        self.gradient = Tensor(1, need_gradient=False)
 
-        # for each node we want te create a Parents Tensor Gradients
-        # print("\nTopo sort:", self.topological_sort())
-        # print("\nself:", self)
-        # print("\nbefore Backward =================")
-        # print("\nself.gradient:", self.gradient)
         for node in reversed(self.topological_sort()):
-            assert node.gradient is not None
-            print("\n=============== New Node =================")
-            for parents in node._context.parents:
-                # print(f"parents len:{len(node._context.parents)}")
-                # print(f"parents: {parents}")
-                print(f"node: {node}\ngradient: {node.gradient}\ncontexte: {node._context}\nbackward: {node._context.backward(node.gradient)}\nEnd ==================")
-                gradients = node._context.backward(node.gradient)
-                # print(f"gradients:{gradients}")
-                # gradients = [Tensor(gradients)]
-                if len(node._context.parents) == 1:
-                    parents.gradient = gradients
-                else:
-                    for parent, gradient in zip(parents, gradients):
-                        assert gradient.shape == parent.shape, f"grad shape must match tensor shape, {gradient.shape!r} != {parent.shape!r}"
-                        parent.gradient = gradient
-                # we have multiple parents and need to match backward result with shape
+            gradients = node._context.backward(node.gradient)
+            # we create a List of Tensors // one for each parents
+            if len(node._context.parents) == 1:
+                gradients = [Tensor(gradients, need_gradient=False)]
+            else:
+                gradients = [Tensor(g, need_gradient=False) for g in gradients]
+            for parent, gradient in zip(node._context.parents, gradients):
+                    parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
+            # remove context as we go backward
             del node._context
         return self
+
+    def mul(self, other):
+        return Mul.apply(self, other)
+
+    def __mul__(self, other):
+        return self.mul(other)
 
     def add(self, other):
         return Add.apply(self, other)
 
+    # __add__ describe how the + operation operate for the class Tensor
     def __add__(self, other):
         return self.add(other)
 
@@ -143,8 +155,8 @@ class Tensor:
     # def __sum__(self):
     #     return self.sum()
 
-    def __repr__(self) -> str:
+    # def __repr__(self) -> str:
         # assert self.ndata.shape is not None
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
-        return f"<Tensor(ndata={self.ndata})>"
+        # return f"<Tensor(ndata={self.ndata})>"

@@ -1,39 +1,41 @@
 import numpy as np
 
-from fusion import Tensor
+from tinygrad.tensor import Tensor
+# from fusion import Tensor
 
 # m = 4096
 m = 3
 t = np.random.rand(m, m).astype(np.float32)
 
-x = Tensor([[1,1,0,2],[1,0,1,5],[0,1,1,9]])
+# x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]])
 # y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]])
-y = Tensor([0,1,0,4])
+x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]], requires_grad=True)
+y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]], requires_grad=True)
 
-# p = 1e-6
-# a = 4
-# b = 7
-#
-# c1 = a * b
-# # a += p
-# b += p
-# c2 = a * b
-# print("slope:", (c2 - c1) / p)
-#
-#
-w = x + y
+
+w = x * y
+t = w + y
 # print(z)
-z = w.sum()
+# z = x.sum()
+z = t.sum()
+# z = w.sum()
 # print(z.shape)
 # print(b._context)
 # print(z._context)
 z.backward()
-# print("z.gradient", z.gradient)
-# print("w.gradient", w.gradient)
+print("t.gradient:", t.grad.numpy())
+print("x.gradient:", x.grad.numpy())
+print("y.gradient:", y.grad.numpy())
+# print("z.gradient:", z.gradient.ndata)
+# print("w.gradient:", w.gradient.ndata)
+# print("t.gradient:", t.gradient.ndata)
+# print("x.gradient:", x.gradient.ndata)
+# print("y.gradient:", y.gradient.ndata)
+# print("z.shape:", z.shape)
+# print("w.shape:", w.shape)
+# print("y.shape:", y.shape)
 # print("z.data:", z.ndata)
 # print("w.data:", w.ndata)
 # print("x.data:", x.ndata)
 # print("y.data:", y.ndata)
-# print("x.gradient:", x.gradient)
-# print("y.gradient:", y.gradient)
 # print("x:", x)

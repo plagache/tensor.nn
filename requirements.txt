@@ -1,1 +1,2 @@
 numpy
+tinygrad==0.7.0
