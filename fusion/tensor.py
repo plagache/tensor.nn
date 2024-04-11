@@ -155,8 +155,8 @@ class Tensor:
     # def __sum__(self):
     #     return self.sum()
 
-    # def __repr__(self) -> str:
+    def __repr__(self) -> str:
         # assert self.ndata.shape is not None
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
-        # return f"<Tensor(ndata={self.ndata})>"
+        return f"<Tensor(ndata={self.ndata}), (need_gradient={self.need_gradient})>"

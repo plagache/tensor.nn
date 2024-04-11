@@ -5,7 +5,8 @@ PYTHON = ${BIN}/python3
 PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
-PROGRAM = simple_operation.py
+PROGRAMS = examples
+PROGRAM = ${PROGRAMS}/simple_operation.py
 
 # ARGUMENTS =
 
@@ -19,8 +20,9 @@ pip_upgrade:
 	${PIP} install --upgrade pip
 
 install: \
-	requirements \
-	# module \
+	module \
+	# requirements \
+
 #
 module: setup.py
 	${PIP} install -e . --upgrade
@@ -41,6 +43,10 @@ run:
 	${PYTHON} ${PROGRAM} \
 	# ${ARGUMENTS}
 
+#
+test:
+	${PYTHON} test/test_ops.py
+
 clean:
 
 fclean: clean
@@ -50,4 +56,4 @@ fclean: clean
 re: fclean setup run
 
 .SILENT:
-.PHONY: setup venv pip_upgrade install module requirements list version run clean fclean re
+.PHONY: setup venv pip_upgrade install module requirements list version run clean fclean re test
