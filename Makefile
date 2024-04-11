@@ -21,7 +21,7 @@ pip_upgrade:
 
 install: \
 	module \
-	# requirements \
+	requirements \
 
 #
 module: setup.py
@@ -45,8 +45,10 @@ run:
 
 #
 test:
-	${PYTHON} test/test_ops.py
+	${PYTHON} test/test_ops.py \
+	-v
 
+#
 clean:
 
 fclean: clean
