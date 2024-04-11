@@ -1,42 +1,34 @@
-import numpy as np
-
-# from tinygrad.tensor import Tensor
+import unittest
 from fusion import Tensor
 
-# m = 4096
-m = 3
-t = np.random.rand(m, m).astype(np.float32)
+class test_gradient(unittest.TestCase):
+    def test_specifique_values(self):
+        x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]])
+        y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]])
+        w = x * y
+        v = w + y
+        z = v.sum()
+        z.backward()
 
-x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]], need_gradient=False)
-y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]], need_gradient=True)
-# x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]], requires_grad=True)
-# y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]], requires_grad=True)
+        z_gradient = z.gradient.ndata
+        assert z_gradient == 1
+        assert z.shape == ()
 
+        v_gradient = v.gradient.ndata
+        assert v_gradient.tolist() == [[1,1,1,1],[1,1,1,1],[1,1,1,1]]
+        assert v_gradient.shape == (3, 4)
 
-w = x * y
-b = w + y
-# print(z)
-# z = x.sum()
-z = b.sum()
-# z = w.sum()
-# print(z.shape)
-# print(b._context)
-# print(z._context)
-z.backward()
-# print("t.gradient:", t.grad.numpy())
-# print("x.gradient:", x.grad.numpy())
-# print("y.gradient:", y.grad.numpy())
-# print("z.gradient:", z.gradient.ndata)
-# print("w.gradient:", w.gradient.ndata)
-print("t.gradient:", b.gradient.ndata)
-print("x.gradient:", x.gradient.ndata)
-print("y.gradient:", y.gradient.ndata)
-# print("z.shape:", z.shape)
-# print("w.shape:", w.shape)
-# print("y.shape:", y.shape)
-# print("z.data:", z.ndata)
-# print("w.data:", w.ndata)
-# print("x.data:", x.ndata)
-# print("y.data:", y.ndata)
-print("x:", x)
-print("y:", y)
+        w_gradient = w.gradient.ndata
+        assert w_gradient.tolist() == [[1,1,1,1],[1,1,1,1],[1,1,1,1]]
+        assert w_gradient.shape == (3, 4)
+
+        x_gradient = x.gradient.ndata
+        assert x_gradient.tolist() == [[0,1,0,4],[0,0,1,7],[1,1,0,8]]
+        assert x_gradient.shape == (3, 4)
+
+        y_gradient = y.gradient.ndata
+        assert y_gradient.tolist() == [[2,3,4,5],[6,7,8,9],[10,1,2,3]]
+        assert y_gradient.shape == (3, 4)
+
+if __name__ == '__main__':
+    unittest.main()
