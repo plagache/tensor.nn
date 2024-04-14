@@ -29,6 +29,10 @@ Create a machine learning framework based on the [micrograd](https://github.com/
 
 ## Details
 
+the base for this to work is the Function class that create:
+- context : parents, type[Function] / ops
+we have made an example in [Functionnement](examples/simple_function)
+
 Data can be of multiples types, and we can do Union of types
 in function of the types we can create different Tensor and determine what to apply
 
@@ -40,10 +44,4 @@ for a given shapes/parents/operations
 
 Lazyness :
     - remove copy in profit of memoryview()
-    - Tensor should only stored what is nescessary to accomplish the backpropagation
-    - we can still display data with numpy function
-    - types allow to create the Tensor but
-    - shape decide what is the scale of the backward propagation
-    - created = Parents
-    - creates = children
-    - Operations = What type of derivatives should we apply between children and parents
+    - create a kernel that represent all the operations / load for one pass

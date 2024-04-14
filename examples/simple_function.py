@@ -13,12 +13,7 @@ class Function():
         raise NotImplementedError
 
 
-    @classmethod
-    def apply(cls:type[Function], self, parents:Tensor):
-        context = cls
-        self._context.parents = parents
-        self._context = context
-        return self
+    # input *tensor to compute return output with context created
 
 
 # implement forward and backward pass
@@ -37,7 +32,7 @@ class Tensor():
     def __init__(self, data:Union[int, float]):
         self.gradient:Optional[Tensor]
         self.data = data
-        self._context:Optional[None]
+        self._context:Optional[Function]
 
     # def topo_sort():
 

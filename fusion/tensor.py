@@ -30,9 +30,9 @@ class Function:
     # The apply method is used to instantiate and execute the forward pass of the function, returning a tensor representing the result.
     # context = Type[Function] that create this result: Add / Sum / Mul
     @classmethod
-    def apply(cls: Type[Function], *x: Tensor):
-        context = cls(*x)
-        output = Tensor(context.forward(*x))
+    def apply(cls: Type[Function], *parent: Tensor):
+        context = cls(*parent)
+        output = Tensor(context.forward(*parent))
         output._context = context
         return output
 
