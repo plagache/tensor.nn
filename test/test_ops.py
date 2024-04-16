@@ -34,9 +34,8 @@ class test_gradient(unittest.TestCase):
         assert y_gradient.shape == (3, 4)
 
     def test_compare_tinygrad_on_random_int(self):
-
-        x_val = np.random.randint(9, size=(3,3)).tolist()
-        y_val = np.random.randint(9, size=(3,3)).tolist()
+        x_val = np.random.randint(9, size=(3, 3)).tolist()
+        y_val = np.random.randint(9, size=(3, 3)).tolist()
 
         x = Tensor(x_val)
         y = Tensor(y_val)
@@ -68,13 +67,6 @@ class test_gradient(unittest.TestCase):
         assert w_gradient.tolist() == w_tiny_grad.tolist()
         assert v_gradient.tolist() == v_tiny_grad.tolist()
         assert z_gradient.tolist() == z_tiny_grad.tolist()
-
-        # print("\n")
-        # print(f"{x_gradient.tolist()} == {x_tiny_grad.tolist()}")
-        # print(f"{y_gradient.tolist()} == {y_tiny_grad.tolist()}")
-        # print(f"{w_gradient.tolist()} == {w_tiny_grad.tolist()}")
-        # print(f"{v_gradient.tolist()} == {v_tiny_grad.tolist()}")
-        # print(f"{z_gradient.tolist()} == {z_tiny_grad.tolist()}")
 
 
 if __name__ == "__main__":
