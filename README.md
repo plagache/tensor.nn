@@ -41,7 +41,7 @@ the base for this project to work are 2 class:
     - gradient
     - \_context : type[Function]/ops, \*parents tensors
 
-we have made an example in [Functionnement](examples/simple_function)
+we have made an example in [Functionnement](examples/simple_function.py)
 
 Data can be of multiples types, and we can do Union of types
 
