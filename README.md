@@ -29,19 +29,37 @@ Create a machine learning framework based on the [micrograd](https://github.com/
 
 ## Details
 
-the base for this to work is the Function class that create:
-- context : parents, type[Function] / ops
+the base for this project to work are 2 class:
+- Function:
+    - subclass(Function): specify forward and backward for a given ops
+    - \*tensors parents: needed for topological sort
+    - apply:
+        - create & assign \_context
+        - return new Tensor based on forward
+- Tensor :
+    - data
+    - gradient
+    - \_context : type[Function]/ops, \*parents tensors
+
 we have made an example in [Functionnement](examples/simple_function)
 
 Data can be of multiples types, and we can do Union of types
-in function of the types we can create different Tensor and determine what to apply
-
-Lazy Imperative Programming :
-We want to evaluate/compute the gradient only 1 time and all at once
-No copy
-backpropagation is described as function
-for a given shapes/parents/operations
 
 Lazyness :
-    - remove copy in profit of memoryview()
-    - create a kernel that represent all the operations / load for one pass
+    - remove copy/tensor creation for each node in profit of memoryview()
+    - create a kernel that represent all the operations to compute the needed gradient / load for one pass
+
+### operations
+
+#### machine learning Ops to calculate derivatives
+
+```
+Relu, Log, Exp                                 # unary ops
+Sum, Max                                       # reduce ops (with axis argument)
+Maximum, Add, Sub, Mul, Pow, Div, Equal        # binary ops (no broadcasting, use expand)
+Expand, Reshape, Permute, Pad, Shrink, Flip    # movement ops
+```
+
+
+#### low level Ops
+these are cpu_features relative to the raw operations of your hardware

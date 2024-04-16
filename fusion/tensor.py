@@ -7,12 +7,6 @@ from numpy import dtype
 
 default_type = np.float32
 
-# it has a Function and a tensor
-# Tensor has the data and the shape
-# Function take a variables number of Tensor and describe the forward and backward pass
-# Forward create context attach to Tensors / parents / ops
-# Backward describe how the gradient is populated
-
 
 class Function:
     def __init__(self, *tensors: Tensor):
@@ -36,6 +30,7 @@ class Function:
         output._context = context
         return output
 
+
 # Binary ops, 2 Tensor same size, no broadcast, use expands
 class Mul(Function):
     def forward(self, x: Tensor, y: Tensor):
@@ -44,7 +39,7 @@ class Mul(Function):
     def backward(self, output: Tensor):
         return output.ndata * self.parents[1].ndata, output.ndata * self.parents[0].ndata
 
-# Binary ops, 2 Tensor same size, no broadcast, use expands
+
 class Add(Function):
     def forward(self, x: Tensor, y: Tensor):
         return np.add(x.ndata, y.ndata)
@@ -52,10 +47,9 @@ class Add(Function):
     def backward(self, output: Tensor):
         return output.ndata, output.ndata
 
+
 # Movement ops, modify size of Tensor
-
 # Unary ops, One input, return one Tensor, exemple: EXP
-
 # Reduce ops, 1 tensor, return scalar value
 class Sum(Function):
     def forward(self, x: Tensor):
