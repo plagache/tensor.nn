@@ -78,7 +78,10 @@ class Tensor:
         self._context: Optional[Function] = None
 
         if isinstance(data, (int, float, np.integer, list)):
-            self.ndata = np.array(data)
+            if isinstance(data, float):
+                self.ndata = np.array(data, dtype=np.float32)
+            else:
+                self.ndata = np.array(data)
             return
 
         if isinstance(data, np.ndarray):

@@ -68,6 +68,49 @@ class test_gradient(unittest.TestCase):
         assert v_gradient.tolist() == v_tiny_grad.tolist()
         assert z_gradient.tolist() == z_tiny_grad.tolist()
 
+    def test_compare_tinygrad_on_float32(self):
+        x_val = np.random.random_sample(size=(3, 3)).tolist()
+        y_val = np.random.random_sample(size=(3, 3)).tolist()
+
+        x = Tensor(x_val)
+        y = Tensor(y_val)
+        w = x * y
+        v = w + y
+        z = v.sum()
+        z.backward()
+        z_gradient = z.gradient.ndata
+        v_gradient = v.gradient.ndata
+        w_gradient = w.gradient.ndata
+        x_gradient = x.gradient.ndata
+        y_gradient = y.gradient.ndata
+
+        x_tiny = Tiny_Tensor(x_val, requires_grad=True)
+        y_tiny = Tiny_Tensor(y_val, requires_grad=True)
+        w_tiny = x_tiny * y_tiny
+        v_tiny = w_tiny + y_tiny
+        z_tiny = v_tiny.sum()
+        z_tiny.backward()
+        z_tiny_grad = z_tiny.grad.numpy()
+        v_tiny_grad = v_tiny.grad.numpy()
+        w_tiny_grad = w_tiny.grad.numpy()
+        x_tiny_grad = x_tiny.grad.numpy()
+        y_tiny_grad = y_tiny.grad.numpy()
+
+        print(f"\n{z.ndata.dtype}")
+        print(z_tiny.numpy().dtype)
+        print(z.ndata)
+        print(z_tiny.numpy())
+        print(f"\n{x_gradient.dtype}")
+        print(f"{x_tiny_grad.dtype}")
+        print(f"{x_gradient}")
+        print(f"{x_tiny_grad}")
+        assert z.ndata == z_tiny.numpy()
+        assert x_gradient.dtype == x_tiny_grad.dtype
+        assert x_gradient.tolist() == x_tiny_grad.tolist()
+        assert y_gradient.tolist() == y_tiny_grad.tolist()
+        assert w_gradient.tolist() == w_tiny_grad.tolist()
+        assert v_gradient.tolist() == v_tiny_grad.tolist()
+        assert z_gradient.tolist() == z_tiny_grad.tolist()
 
 if __name__ == "__main__":
     unittest.main()
