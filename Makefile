@@ -49,6 +49,9 @@ test:
 	-v
 
 #
+function:
+	${PYTHON} examples/simple_function.py \
+
 clean:
 
 fclean: clean
