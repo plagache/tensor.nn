@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Optional, Union
+
+from typing import Optional, Union, Type
 
 
 class Function():
@@ -17,17 +18,19 @@ class Function():
     # input *parents_tensor to compute return new tensor with context
     # the goal is to use the correct subclass of the Function and being able to use the corresponding backward
     @classmethod
-    def apply(cls:type[Function], *parents):
-        # print(cls)
+    def apply(cls: Type[Function], *parents):
+        print(f"cls: {cls}")
         context = cls(*parents)
-        # print("context: ", context)
+        print("context: ", context)
         output = Tensor(context.forward(*parents))
-        # print("context forward: ", context.forward(*parents))
+        # output = Tensor(cls(*parents).forward(*parents))
+        print("context forward: ", context.forward(*parents))
         output._context = context
         # print("tensor: ", output)
         # print("tensor data: ", output.data)
         # print("tensor context: ", output._context)
         # print("tensor context parents: ", output._context.parents)
+        print("Return -----------------------")
         return output
 
 
