@@ -31,24 +31,6 @@ class Function:
         return output
 
 
-# Binary ops, 2 Tensor same size, no broadcast, use expands
-class Mul(Function):
-    def forward(self, x: Tensor, y: Tensor):
-        return np.multiply(x.ndata, y.ndata)
-
-    def backward(self, output: Tensor):
-        return output.ndata * self.parents[1].ndata, output.ndata * self.parents[0].ndata
-
-
-class Add(Function):
-    def forward(self, x: Tensor, y: Tensor):
-        return np.add(x.ndata, y.ndata)
-
-    def backward(self, output: Tensor):
-        return output.ndata, output.ndata
-
-
-# Movement ops, modify size of Tensor
 # Unary ops, One input, return one Tensor, exemple: EXP
 # Reduce ops, 1 tensor, return scalar value
 class Sum(Function):
@@ -58,6 +40,37 @@ class Sum(Function):
 
     def backward(self, output: Tensor):
         return np.broadcast_to(output.ndata, self.input_shape)
+
+
+# Binary ops, 2 Tensor same size, no broadcast, use expands
+class Add(Function):
+    def forward(self, x: Tensor, y: Tensor):
+        return np.add(x.ndata, y.ndata)
+
+    def backward(self, output: Tensor):
+        return output.ndata, output.ndata
+
+
+class Mul(Function):
+    def forward(self, x: Tensor, y: Tensor):
+        return np.multiply(x.ndata, y.ndata)
+
+    def backward(self, output: Tensor):
+        return output.ndata * self.parents[1].ndata, output.ndata * self.parents[0].ndata
+
+
+# Movement ops, modify size of Tensor
+class Expand(Function):
+    def forward(self, output_shape: Tuple, x: Tensor):
+        self.input_shape = x.shape
+        self.output_shape = output_shape
+        print(self.input_shape)
+        print(self.output_shape)
+        # return x.ndata.reshape(self.output_shape)
+        return np.reshape(x.ndata, self.output_shape)
+
+    def backward(self, output: Tensor):
+        return output.ndata
 
 
 class Tensor:
@@ -133,11 +146,8 @@ class Tensor:
             del node._context
         return self
 
-    def mul(self, other):
-        return Mul.apply(self, other)
-
-    def __mul__(self, other):
-        return self.mul(other)
+    def sum(self):
+        return Sum.apply(self)
 
     def add(self, other):
         return Add.apply(self, other)
@@ -146,11 +156,14 @@ class Tensor:
     def __add__(self, other):
         return self.add(other)
 
-    def sum(self):
-        return Sum.apply(self)
+    def mul(self, other):
+        return Mul.apply(self, other)
 
-    # def __sum__(self):
-    #     return self.sum()
+    def __mul__(self, other):
+        return self.mul(other)
+
+    def expand(self, shape):
+        return Expand.apply(shape, self)
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None

@@ -9,12 +9,15 @@ t = np.random.rand(m, m).astype(np.float32)
 
 x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]], need_gradient=False)
 y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]], need_gradient=True)
+s = Tensor([0,1,0,4], need_gradient=True)
 # x = Tensor([[1,2,3,4],[5,6,7,8],[9,0,1,2]], requires_grad=True)
 # y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]], requires_grad=True)
 
 
 w = x * y
 t = w + y
+r = s.expand((4,3))
+print(r)
 # print(z)
 # z = x.sum()
 z = t.sum()
