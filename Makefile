@@ -1,7 +1,7 @@
-SYSTEM_PYTHON = /usr/bin/python3
+SYSTEM_PYTHON = /usr/bin/python3.11
 VENV = .venv
 BIN = ${VENV}/bin
-PYTHON = ${BIN}/python3
+PYTHON = ${BIN}/python3.11
 PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
