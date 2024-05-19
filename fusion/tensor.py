@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Optional, Tuple, Type, Union
 
 import numpy as np
-from numpy import dtype
+# from numpy import dtype
+# from fusion.shape import shape_extractor
 
 default_type = np.float32
 
@@ -60,17 +61,15 @@ class Mul(Function):
 
 
 # Movement ops, modify size of Tensor
-class Expand(Function):
-    def forward(self, output_shape: Tuple, x: Tensor):
-        self.input_shape = x.shape
-        self.output_shape = output_shape
-        print(self.input_shape)
-        print(self.output_shape)
-        # return x.ndata.reshape(self.output_shape)
-        return np.reshape(x.ndata, self.output_shape)
-
-    def backward(self, output: Tensor):
-        return output.ndata
+# class Expand(Function):
+#     def forward(self, x: Tensor, output_shape: Tuple):
+#         self.input_shape = x.shape
+#         self.output_shape = output_shape
+#         self.diff = shape_extractor(self.input_shape, self.output_shape)
+#         return np.tile(x.ndata, (self.diff,1))
+#
+#     def backward(self, output: Tensor):
+#         return output.ndata
 
 
 class Tensor:
@@ -122,20 +121,20 @@ class Tensor:
                     node_visited.add(node)
                     for parent in node._context.parents:
                         _topological_sort(parent, node_visited, graph_sorted)
-                        # yield / is for lazy, and yield the data
+                        # yield / is for lazy, thus yielding the data
                     graph_sorted.append(node)
             return graph_sorted
 
         return _topological_sort(self, set(), [])
 
-    # Create new Tensor at each node with the gradients
+    # Create new Tensor at each node being the gradients
     def backward(self):
         # First gradient is always one
         self.gradient = Tensor(1, need_gradient=False)
 
         for node in reversed(self.topological_sort()):
             gradients = node._context.backward(node.gradient)
-            # we create a List of Tensors // one for each parents
+            # we compute gradient // one for each parents
             if len(node._context.parents) == 1:
                 gradients = [Tensor(gradients, need_gradient=False)]
             else:
@@ -162,11 +161,14 @@ class Tensor:
     def __mul__(self, other):
         return self.mul(other)
 
-    def expand(self, shape):
-        return Expand.apply(shape, self)
+    # def expand(self, shape):
+    #     return Expand.apply(self, shape)
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
-        return f"<Tensor(ndata={self.ndata}), (need_gradient={self.need_gradient})>"
+        if self.gradient is not None:
+            return f"<Tensor(ndata={self.ndata}, gradient={self.gradient} ,need_gradient={self.need_gradient})>"
+        else:
+            return f"<Tensor(ndata={self.ndata}, need_gradient={self.need_gradient})>"
