@@ -40,7 +40,8 @@ class Sum(Function):
         return np.sum(x.ndata)
 
     def backward(self, output: Tensor):
-        return np.broadcast_to(output.ndata, self.input_shape)
+        # return np.broadcast_to(output.ndata, self.input_shape)
+        return output.ndata * np.ones_like(self._context.parent)
 
 
 # Binary ops, 2 Tensor same size, no broadcast, use expands
@@ -59,6 +60,18 @@ class Mul(Function):
     def backward(self, output: Tensor):
         return output.ndata * self.parents[1].ndata, output.ndata * self.parents[0].ndata
 
+
+class Relu(Function):
+    def forward(self, x:Tensor):
+        # compare to 0
+        # replace if input < 0
+        return np.maximum(x.ndata, 0)
+
+    def backward(self, output: Tensor):
+        input = self.parents.ndata
+        output_gradient = output.ndata
+        output_gradient[input < 0] = 0
+        return output_gradient
 
 # Movement ops, modify size of Tensor
 # class Expand(Function):
@@ -91,7 +104,8 @@ class Tensor:
 
         if isinstance(data, (int, float, np.integer, list)):
             if isinstance(data, float):
-                self.ndata = np.array(data, dtype=np.float32)
+                self.ndata = np.array(data, dtype=np.default_type)
+                # self.ndata = np.array(data, dtype=np.float32)
             else:
                 self.ndata = np.array(data)
             return

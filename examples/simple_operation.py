@@ -43,3 +43,6 @@ if __name__ == "__main__":
     # print("y.data:", y.ndata)
     print("x:", x)
     print("y:", y)
+
+
+    s = 0.0004
