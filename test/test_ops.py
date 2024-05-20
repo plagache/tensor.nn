@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from fusion import Tensor
 from tinygrad.tensor import Tensor as Tiny_Tensor
+# from tinygrad.dtype import dtypes
 
 
 class test_gradient(unittest.TestCase):
@@ -36,37 +37,54 @@ class test_gradient(unittest.TestCase):
     def test_compare_tinygrad_on_random_int(self):
         x_val = np.random.randint(9, size=(3, 3)).tolist()
         y_val = np.random.randint(9, size=(3, 3)).tolist()
+        # x_val = np.random.uniform(-9, 9, size=(3, 3)).tolist()
+        # y_val = np.random.uniform(-9, 9, size=(3, 3)).tolist()
+        # print(x_val)
+        # print(y_val)
 
         x = Tensor(x_val)
         y = Tensor(y_val)
         w = x * y
         v = w + y
-        z = v.sum()
+        r = v.relu()
+        z = r.sum()
         z.backward()
         z_gradient = z.gradient.ndata
+        r_gradient = r.gradient.ndata
         v_gradient = v.gradient.ndata
         w_gradient = w.gradient.ndata
         x_gradient = x.gradient.ndata
         y_gradient = y.gradient.ndata
 
+        # x_tiny = Tiny_Tensor(x_val, requires_grad=True, dtype=dtypes.int)
+        # y_tiny = Tiny_Tensor(y_val, requires_grad=True, dtype=dtypes.int)
         x_tiny = Tiny_Tensor(x_val, requires_grad=True)
         y_tiny = Tiny_Tensor(y_val, requires_grad=True)
         w_tiny = x_tiny * y_tiny
         v_tiny = w_tiny + y_tiny
-        z_tiny = v_tiny.sum()
+        r_tiny = v_tiny.relu()
+        z_tiny = r_tiny.sum()
         z_tiny.backward()
         z_tiny_grad = z_tiny.grad.numpy()
+        r_tiny_grad = r_tiny.grad.numpy()
         v_tiny_grad = v_tiny.grad.numpy()
         w_tiny_grad = w_tiny.grad.numpy()
         x_tiny_grad = x_tiny.grad.numpy()
         y_tiny_grad = y_tiny.grad.numpy()
 
+        # print(z.ndata, z_tiny.numpy())
+        # print(z_tiny.numpy())
+        # print(z_tiny.numpy().data.tobytes())
+        # print(x_tiny.numpy().data.tobytes())
         assert z.ndata == z_tiny.numpy()
+        assert z_gradient.tolist() == z_tiny_grad.tolist()
+        assert z_gradient.tolist() == z_tiny_grad.tolist()
+        assert r_gradient.tolist() == r_tiny_grad.tolist()
+        assert v_gradient.tolist() == v_tiny_grad.tolist()
+        assert w_gradient.tolist() == w_tiny_grad.tolist()
+        # print(f"mine:\n", x_gradient.tolist(), f"\ntiny:\n", x_tiny_grad.tolist())
         assert x_gradient.tolist() == x_tiny_grad.tolist()
         assert y_gradient.tolist() == y_tiny_grad.tolist()
-        assert w_gradient.tolist() == w_tiny_grad.tolist()
-        assert v_gradient.tolist() == v_tiny_grad.tolist()
-        assert z_gradient.tolist() == z_tiny_grad.tolist()
 
     # def test_compare_tinygrad_on_float32(self):
     #     x_val = np.random.random_sample(size=(3, 3)).tolist()

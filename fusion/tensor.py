@@ -35,13 +35,12 @@ class Function:
 # Unary ops, One input, return one Tensor, exemple: EXP
 # Reduce ops, 1 tensor, return scalar value
 class Sum(Function):
-    def forward(self, x: Tensor):
-        self.input_shape = x.shape
-        return np.sum(x.ndata)
+    def forward(self, input: Tensor):
+        self.input_shape = input.shape
+        return np.sum(input.ndata)
 
     def backward(self, output: Tensor):
-        # return np.broadcast_to(output.ndata, self.input_shape)
-        return output.ndata * np.ones_like(self._context.parent)
+        return output.ndata * np.ones(self.input_shape)
 
 
 # Binary ops, 2 Tensor same size, no broadcast, use expands
@@ -68,9 +67,9 @@ class Relu(Function):
         return np.maximum(x.ndata, 0)
 
     def backward(self, output: Tensor):
-        input = self.parents.ndata
-        output_gradient = output.ndata
-        output_gradient[input < 0] = 0
+        input, = self.parents
+        output_gradient = np.copy(output.ndata)
+        output_gradient[input.ndata <= 0] = 0
         return output_gradient
 
 # Movement ops, modify size of Tensor
@@ -90,9 +89,9 @@ class Tensor:
     # slots are more efficient in terms of memory space and speed of access, and a bit safer than the default Python method of data access
     # __slots__ = "ndata", "need_gradient", "gradient", "_context"
 
-    def __init__(self, data: Union[int, float, list, np.ndarray], need_gradient: Optional[bool] = None):
+    def __init__(self, data: Union[int, float, list, np.ndarray], requires_gradient: Optional[bool] = None):
         # True for parameters training / False for inference / inputs / labels
-        self.need_gradient: Optional[bool] = need_gradient
+        self.requires_gradient: Optional[bool] = requires_gradient
 
         # for the zero_grad we set to None the value of gradients and we can use the None to do operation like
         # we create a copy in shape of the tensor and zeroed all the value
@@ -104,7 +103,7 @@ class Tensor:
 
         if isinstance(data, (int, float, np.integer, list)):
             if isinstance(data, float):
-                self.ndata = np.array(data, dtype=np.default_type)
+                self.ndata = np.array(data, dtype=default_type)
                 # self.ndata = np.array(data, dtype=np.float32)
             else:
                 self.ndata = np.array(data)
@@ -144,15 +143,15 @@ class Tensor:
     # Create new Tensor at each node being the gradients
     def backward(self):
         # First gradient is always one
-        self.gradient = Tensor(1, need_gradient=False)
+        self.gradient = Tensor(1, requires_gradient=False)
 
         for node in reversed(self.topological_sort()):
             gradients = node._context.backward(node.gradient)
             # we compute gradient // one for each parents
             if len(node._context.parents) == 1:
-                gradients = [Tensor(gradients, need_gradient=False)]
+                gradients = [Tensor(gradients, requires_gradient=False)]
             else:
-                gradients = [Tensor(g, need_gradient=False) for g in gradients]
+                gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                     parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
             # remove context as we go backward
@@ -175,6 +174,9 @@ class Tensor:
     def __mul__(self, other):
         return self.mul(other)
 
+    def relu(self):
+             return Relu.apply(self)
+
     # def expand(self, shape):
     #     return Expand.apply(self, shape)
 
@@ -183,6 +185,6 @@ class Tensor:
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
         if self.gradient is not None:
-            return f"<Tensor(ndata={self.ndata}, gradient={self.gradient} ,need_gradient={self.need_gradient})>"
+            return f"<Tensor(ndata={self.ndata}, gradient={self.gradient} ,requires_gradient={self.requires_gradient})>"
         else:
-            return f"<Tensor(ndata={self.ndata}, need_gradient={self.need_gradient})>"
+            return f"<Tensor(ndata={self.ndata}, requires_gradient={self.requires_gradient})>"
