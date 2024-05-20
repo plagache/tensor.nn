@@ -5,6 +5,9 @@ Fusion of different machine learning tools
 ## Objectives
 Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a tensor class based on numpy.
 
+- Build and train a small neural network to detect handwritten digits
+    - Relu
+    - dot
 
 ## ToDo
 

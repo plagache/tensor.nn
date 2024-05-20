@@ -6,7 +6,8 @@ PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
 PROGRAMS = examples
-PROGRAM = ${PROGRAMS}/simple_operation.py
+SIMPLE_OPS = ${PROGRAMS}/simple_operation.py
+MNIST = ${PROGRAMS}/mnist.py
 
 # ARGUMENTS =
 
@@ -40,7 +41,12 @@ size:
 	du -hd 0 ${VENV}
 
 run:
-	${PYTHON} ${PROGRAM} \
+	${PYTHON} ${SIMPLE_OPS} \
+	# ${ARGUMENTS}
+
+#
+mnist:
+	${PYTHON} ${MNIST} \
 	# ${ARGUMENTS}
 
 #
