@@ -22,7 +22,8 @@ if __name__ == "__main__":
     # t = t.transpose()
     # w = x * t
     # y = y.transpose()
-    d = y.dot(t)
+    # d = y.dot(t)
+    d = t.T.dot(y.T)
     r = d.relu()
     z = r.sum()
     # print(z.shape)

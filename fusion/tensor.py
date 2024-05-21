@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, Tuple, Type, Union
 
 import numpy as np
-# from numpy import dtype
+from numpy import dtype
 # from fusion.shape import shape_extractor
 
 default_type = np.float32
@@ -199,6 +199,11 @@ class Tensor:
     def transpose(self):
         self.ndata = self.ndata.T
         return self
+
+    def __getattr__(self, name):
+        if name == 'T':
+            return self.transpose()
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None
