@@ -4,5 +4,5 @@ from setuptools import setup
 
 setup(name='fusion',
       packages=['fusion'],
-      install_requires=["numpi","tinygrad==0.7.0"],
+      install_requires=["numpy","tinygrad==0.7.0"],
 )

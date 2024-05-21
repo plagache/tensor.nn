@@ -41,6 +41,17 @@ class Sum(Function):
         # return np.ones_like(x.ndata) * output.ndata
 
 
+class Relu(Function):
+    def forward(self, input:Tensor):
+        return np.maximum(input.ndata, 0)
+
+    def backward(self, output: Tensor):
+        x, = self.parents
+        output_gradient = np.copy(output.ndata)
+        output_gradient[x.ndata <= 0] = 0
+        return output_gradient
+
+
 class Add(Function):
     def forward(self, x: Tensor, y: Tensor):
         return np.add(x.ndata, y.ndata)
@@ -58,23 +69,22 @@ class Mul(Function):
         return output.ndata * y.ndata, output.ndata * x.ndata
 
 
-class Relu(Function):
-    def forward(self, input:Tensor):
-        return np.maximum(input.ndata, 0)
-
-    def backward(self, output: Tensor):
-        x, = self.parents
-        output_gradient = np.copy(output.ndata)
-        output_gradient[x.ndata <= 0] = 0
-        return output_gradient
-
-
 class Dot(Function):
     def forward(self, x: Tensor, y: Tensor):
-        return
+        # x(A, B)
+        # y(B, C)
+        # output(A, C)
+        return np.dot(x.ndata, y.ndata)
 
     def backward(self, output: Tensor):
-        return
+        x, y = self.parents
+        # output :  (A, C)
+        # y.T :     (C, B)
+        # result :  (A, B)
+        # output.T :(C, A)
+        # x :       (A, B)
+        # result :  (C, B).T // we then transpose it to go in y_gradient
+        return np.dot(output.ndata, y.ndata.T), np.dot(output.ndata.T, x.ndata).T
 
 
 # Movement ops, modify size of Tensor
@@ -157,7 +167,8 @@ class Tensor:
             else:
                 gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
-                    parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
+                    # parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
+                    parent.gradient = gradient
             del node._context
         return self
 
@@ -179,17 +190,21 @@ class Tensor:
     def relu(self):
         return Relu.apply(self)
 
-    def dot(self):
-        return Dot.apply(self)
+    def dot(self, other):
+        return Dot.apply(self, other)
 
     # def expand(self, shape):
     #     return Expand.apply(self, shape)
+
+    def transpose(self):
+        self.ndata = self.ndata.T
+        return self
 
     def __repr__(self) -> str:
         # assert self.ndata.shape is not None
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
         if self.gradient is not None:
-            return f"<Tensor(ndata={self.ndata}, gradient={self.gradient} ,requires_gradient={self.requires_gradient})>"
+            return f"<Tensor(ndata={self.ndata}, gradient={self.gradient.ndata} ,requires_gradient={self.requires_gradient})>"
         else:
             return f"<Tensor(ndata={self.ndata}, requires_gradient={self.requires_gradient})>"
