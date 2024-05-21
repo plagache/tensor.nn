@@ -13,8 +13,6 @@ class Function:
     def __init__(self, *tensors: Tensor):
         self.parents = tensors
 
-    # *args = positional arguments
-    # **kwargs = keyword arguments
     def forward(self, *args):
         raise NotImplementedError("forward not implemented")
 
@@ -32,18 +30,17 @@ class Function:
         return output
 
 
-# Unary ops, One input, return one Tensor, exemple: EXP
-# Reduce ops, 1 tensor, return scalar value
 class Sum(Function):
     def forward(self, input: Tensor):
-        self.input_shape = input.shape
         return np.sum(input.ndata)
 
     def backward(self, output: Tensor):
-        return output.ndata * np.ones(self.input_shape)
+        # this line unpack the tuple of (*self.parents)
+        x, = self.parents
+        return np.ones(x.shape) * output.ndata
+        # return np.ones_like(x.ndata) * output.ndata
 
 
-# Binary ops, 2 Tensor same size, no broadcast, use expands
 class Add(Function):
     def forward(self, x: Tensor, y: Tensor):
         return np.add(x.ndata, y.ndata)
@@ -57,20 +54,28 @@ class Mul(Function):
         return np.multiply(x.ndata, y.ndata)
 
     def backward(self, output: Tensor):
-        return output.ndata * self.parents[1].ndata, output.ndata * self.parents[0].ndata
+        x, y = self.parents
+        return output.ndata * y.ndata, output.ndata * x.ndata
 
 
 class Relu(Function):
-    def forward(self, x:Tensor):
-        # compare to 0
-        # replace if input < 0
-        return np.maximum(x.ndata, 0)
+    def forward(self, input:Tensor):
+        return np.maximum(input.ndata, 0)
 
     def backward(self, output: Tensor):
-        input, = self.parents
+        x, = self.parents
         output_gradient = np.copy(output.ndata)
-        output_gradient[input.ndata <= 0] = 0
+        output_gradient[x.ndata <= 0] = 0
         return output_gradient
+
+
+class Dot(Function):
+    def forward(self, x: Tensor, y: Tensor):
+        return
+
+    def backward(self, output: Tensor):
+        return
+
 
 # Movement ops, modify size of Tensor
 # class Expand(Function):
@@ -140,7 +145,6 @@ class Tensor:
 
         return _topological_sort(self, set(), [])
 
-    # Create new Tensor at each node being the gradients
     def backward(self):
         # First gradient is always one
         self.gradient = Tensor(1, requires_gradient=False)
@@ -154,7 +158,6 @@ class Tensor:
                 gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                     parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
-            # remove context as we go backward
             del node._context
         return self
 
@@ -164,7 +167,6 @@ class Tensor:
     def add(self, other):
         return Add.apply(self, other)
 
-    # __add__ describe how the + operation operate for the class Tensor
     def __add__(self, other):
         return self.add(other)
 
@@ -175,7 +177,10 @@ class Tensor:
         return self.mul(other)
 
     def relu(self):
-             return Relu.apply(self)
+        return Relu.apply(self)
+
+    def dot(self):
+        return Dot.apply(self)
 
     # def expand(self, shape):
     #     return Expand.apply(self, shape)
