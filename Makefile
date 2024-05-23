@@ -38,6 +38,7 @@ version:
 	${PYTHON} --version
 
 size:
+	du -hd 0
 	du -hd 0 ${VENV}
 
 run:
@@ -45,7 +46,7 @@ run:
 	# ${ARGUMENTS}
 
 #
-mnist:
+mnist: static
 	${PYTHON} ${MNIST} \
 	# ${ARGUMENTS}
 
@@ -58,7 +59,11 @@ test:
 function:
 	${PYTHON} examples/simple_function.py \
 
+static:
+	mkdir -p static/Datasets
+
 clean:
+	rm -rf static/Datasets
 
 fclean: clean
 	rm -rf ${VENV}
