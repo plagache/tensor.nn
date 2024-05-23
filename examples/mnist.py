@@ -1,10 +1,11 @@
 from fusion import Tensor
 
-import gzip, requests
+import numpy as np
+import gzip, requests, os, hashlib
 
 common_url = "http://yann.lecun.com/exdb/mnist/" # not accessible anymore
 google_url = "https://storage.googleapis.com/cvdf-datasets/mnist/"
-file_path = "static/Datasets/"
+datasets_path = "static/Datasets/"
 
 data_sources = {
     "training_images": "train-images-idx3-ubyte.gz",
@@ -13,17 +14,22 @@ data_sources = {
     "test_labels": "t10k-labels-idx1-ubyte.gz",
 }
 
-def download_data(url, filename):
+
+def fetch(url):
+    file_path = os.path.join(datasets_path, hashlib.sha1(url.encode('utf-8')).hexdigest())
     with requests.get(url, stream=True) as response:
         response.raise_for_status()
-        with open(file_path+filename, "wb") as file:
-            file.write(response.content)
-    return response
+        with open(file_path, "wb") as file:
+            data = response.content
+            file.write(data)
+    return np.frombuffer(gzip.decompress(data), dtype=np.uint8).copy()
 
-def fetch_mnist():
-    for name in data_sources:
-        download_data(google_url+data_sources[name], name)
-    return
 
 if __name__ == "__main__":
-    fetch_mnist()
+    X_train = fetch(google_url+data_sources["training_images"])[0x10:].reshape(-1, 28, 28)
+    Y_train = fetch(google_url+data_sources["training_labels"])[8:]
+    X_test = fetch(google_url+data_sources["test_images"])[0x10:].reshape(-1, 28, 28)
+    Y_test = fetch(google_url+data_sources["test_labels"])[8:]
+    print(X_train)
+    print(np.info(X_train))
+    print(Y_train)

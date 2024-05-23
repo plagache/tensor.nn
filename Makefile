@@ -63,7 +63,7 @@ static:
 	mkdir -p static/Datasets
 
 clean:
-	rm -rf static/Datasets
+	rm -rf static/
 
 fclean: clean
 	rm -rf ${VENV}
