@@ -60,7 +60,7 @@ function:
 	${PYTHON} examples/simple_function.py \
 
 static:
-	mkdir -p static/Datasets
+	mkdir -p static/datasets
 
 clean:
 	rm -rf static/

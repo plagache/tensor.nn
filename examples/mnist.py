@@ -1,11 +1,14 @@
-from fusion import Tensor
+import gzip
+import hashlib
+import os
 
 import numpy as np
-import gzip, requests, os, hashlib
+import requests
+from fusion import Tensor
 
 common_url = "http://yann.lecun.com/exdb/mnist/" # not accessible anymore
 google_url = "https://storage.googleapis.com/cvdf-datasets/mnist/"
-datasets_path = "static/Datasets/"
+datasets_path = "static/datasets/"
 
 data_sources = {
     "training_images": "train-images-idx3-ubyte.gz",
@@ -22,7 +25,8 @@ def fetch(url):
         with open(file_path, "wb") as file:
             data = response.content
             file.write(data)
-    return np.frombuffer(gzip.decompress(data), dtype=np.uint8).copy()
+    return np.frombuffer(gzip.decompress(data), dtype=np.uint8)
+    return np.frombuffer(gzip.decompress(data), dtype=np.uint8, offset=16) # but offset depends on the data labels 8, training 16
 
 
 if __name__ == "__main__":
@@ -33,3 +37,4 @@ if __name__ == "__main__":
     print(X_train)
     print(np.info(X_train))
     print(Y_train)
+    # visualize data with matplolib and compare to label to verify our data
