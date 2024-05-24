@@ -21,12 +21,17 @@ data_sources = {
 def fetch(url):
     file_path = os.path.join(datasets_path, hashlib.sha1(url.encode('utf-8')).hexdigest())
     isExisting = os.path.exists(file_path)
-    # print(isExisting)
-    with requests.get(url, stream=True) as response:
-        response.raise_for_status()
-        with open(file_path, "wb") as file:
-            data = response.content
-            file.write(data)
+    if isExisting is True:
+        print(f"{file_path} already exist")
+        with open(file_path, "rb") as file:
+            data = file.read()
+    else:
+        print(f"Downloading {file_path}")
+        with requests.get(url, stream=True) as response:
+            response.raise_for_status()
+            with open(file_path, "wb") as file:
+                data = response.content
+                file.write(data)
     return np.frombuffer(gzip.decompress(data), dtype=np.uint8)
     return np.frombuffer(gzip.decompress(data), dtype=np.uint8, offset=16) # but offset depends on the data labels 8, training 16
 
@@ -36,7 +41,9 @@ if __name__ == "__main__":
     Y_train = fetch(google_url+data_sources["training_labels"])[8:]
     X_test = fetch(google_url+data_sources["test_images"])[0x10:].reshape(-1, 28, 28)
     Y_test = fetch(google_url+data_sources["test_labels"])[8:]
-    print(X_train)
-    print(np.info(X_train))
-    print(Y_train)
+    # print(X_train)
+    # print(Tensor(X_train))
+    # print(np.info(X_train))
+    # print(Y_train)
+    # print(np.info(Y_train))
     # visualize data with matplolib and compare to label to verify our data
