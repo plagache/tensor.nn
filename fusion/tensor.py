@@ -158,6 +158,7 @@ class Tensor:
     def backward(self):
         # First gradient is always one
         self.gradient = Tensor(1, requires_gradient=False)
+        # self.gradient = Tensor(np.ones_like(self.ndata), requires_gradient=False)
 
         for node in reversed(self.topological_sort()):
             gradients = node._context.backward(node.gradient)

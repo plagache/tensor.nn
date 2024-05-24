@@ -20,6 +20,8 @@ data_sources = {
 
 def fetch(url):
     file_path = os.path.join(datasets_path, hashlib.sha1(url.encode('utf-8')).hexdigest())
+    isExisting = os.path.exists(file_path)
+    # print(isExisting)
     with requests.get(url, stream=True) as response:
         response.raise_for_status()
         with open(file_path, "wb") as file:
