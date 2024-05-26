@@ -5,6 +5,8 @@ import os
 import numpy as np
 import requests
 from fusion import Tensor
+import matplotlib.pyplot as pyplot
+from tqdm import tqdm
 
 common_url = "http://yann.lecun.com/exdb/mnist/" # not accessible anymore
 google_url = "https://storage.googleapis.com/cvdf-datasets/mnist/"
@@ -17,6 +19,10 @@ data_sources = {
     "test_labels": "t10k-labels-idx1-ubyte.gz",
 }
 
+def plot_mnist(image, title):
+    pyplot.imshow(image, cmap="gray")
+    pyplot.title(title)
+    pyplot.show()
 
 def fetch(url):
     file_path = os.path.join(datasets_path, hashlib.sha1(url.encode('utf-8')).hexdigest())
@@ -41,9 +47,59 @@ if __name__ == "__main__":
     Y_train = fetch(google_url+data_sources["training_labels"])[8:]
     X_test = fetch(google_url+data_sources["test_images"])[0x10:].reshape(-1, 28, 28)
     Y_test = fetch(google_url+data_sources["test_labels"])[8:]
+    index_nbr = 55
+    # plot_mnist(X_train[index_nbr], Y_train[index_nbr])
     # print(X_train)
+    # print(np.info(X_train))
+    # convert 255 values into floating point
+    X_train = X_train / 255
+    # print(X_train[index_nbr])
+    X_train = X_train.astype(np.float32)
+    # print(X_train[index_nbr])
+    # print(X_train)
+    # print(np.info(X_train))
     # print(Tensor(X_train))
     # print(np.info(X_train))
     # print(Y_train)
     # print(np.info(Y_train))
     # visualize data with matplolib and compare to label to verify our data
+
+    hidden_size = 128
+    number_of_output = 10
+    batch_size = 100
+    steps = 1000
+    learning_rate = 0.001
+    # h: height of the layer
+    # m: probably number of input for each neuron in the layer
+    # this function initialize the weight/parameters of our layers
+    def init_layer(m, h):
+        initial_parameters = np.random.uniform(-1.0, 1.0, size=(m, h))
+
+        # Scaling with Xavier Glorot initaliazation
+        # layer = initial_parameters / np.sqrt(m * h)
+        layer = initial_parameters
+
+        return layer.astype(np.float32)
+
+    # create class
+    class neural_network():
+        def __init__(self):
+            self.layer_1 = Tensor(init_layer(784, hidden_size))
+            self.layer_2 = Tensor(init_layer(hidden_size, number_of_output))
+
+        def forward(self, x):
+            output = x.dot(self.layer_1).relu().dot(self.layer_2)
+            return output
+
+
+    for step in (t := tqdm(range(steps))):
+        sample = np.random.randint(X_train.shape[0], size=batch_size)  # Randomly select size samples
+        model = neural_network()
+
+        outputs = model.forward(Tensor(X_train[sample].reshape(-1, 28*28)))
+        outputs.backward()
+        print(outputs)
+        print(model.layer_1.gradient)
+        # calculate the loss
+        # update the layer
+        exit()

@@ -1,3 +1,5 @@
 numpy
 tinygrad==0.7.0
+matplotlib
+tqdm
 ipython
