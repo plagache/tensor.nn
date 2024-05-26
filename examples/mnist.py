@@ -43,18 +43,18 @@ def fetch(url):
 
 
 if __name__ == "__main__":
-    X_train = fetch(google_url+data_sources["training_images"])[0x10:].reshape(-1, 28, 28)
-    Y_train = fetch(google_url+data_sources["training_labels"])[8:]
-    X_test = fetch(google_url+data_sources["test_images"])[0x10:].reshape(-1, 28, 28)
-    Y_test = fetch(google_url+data_sources["test_labels"])[8:]
+    x_train = fetch(google_url+data_sources["training_images"])[0x10:].reshape(-1, 28, 28)
+    y_train = fetch(google_url+data_sources["training_labels"])[8:]
+    x_test = fetch(google_url+data_sources["test_images"])[0x10:].reshape(-1, 28, 28)
+    y_test = fetch(google_url+data_sources["test_labels"])[8:]
     index_nbr = 55
     # plot_mnist(X_train[index_nbr], Y_train[index_nbr])
     # print(X_train)
     # print(np.info(X_train))
     # convert 255 values into floating point
-    X_train = X_train / 255
+    x_train = x_train / 255
     # print(X_train[index_nbr])
-    X_train = X_train.astype(np.float32)
+    x_train = x_train.astype(np.float32)
     # print(X_train[index_nbr])
     # print(X_train)
     # print(np.info(X_train))
@@ -65,7 +65,9 @@ if __name__ == "__main__":
     # visualize data with matplolib and compare to label to verify our data
 
     hidden_size = 128
+    # the 2 next should be the same U_u
     number_of_output = 10
+    number_of_label = 10
     batch_size = 100
     steps = 1000
     learning_rate = 0.001
@@ -93,13 +95,18 @@ if __name__ == "__main__":
 
 
     for step in (t := tqdm(range(steps))):
-        sample = np.random.randint(X_train.shape[0], size=batch_size)  # Randomly select size samples
+        sample = np.random.randint(x_train.shape[0], size=batch_size)  # Randomly select batch_size samples
         model = neural_network()
 
-        outputs = model.forward(Tensor(X_train[sample].reshape(-1, 28*28)))
-        outputs.backward()
-        print(outputs)
-        print(model.layer_1.gradient)
+        x = model.forward(Tensor(x_train[sample].reshape(-1, 28*28)))
+
+        # create the y
+        y_sampled = y_train[sample]
+        ys = np.zeros((len(sample), number_of_label), np.float32)
+        print("\nys :", ys)
+        print("\nx :", x)
+        x.backward()
         # calculate the loss
         # update the layer
+        print(model.layer_1.gradient)
         exit()
