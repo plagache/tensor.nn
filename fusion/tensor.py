@@ -4,11 +4,13 @@ from typing import Optional, Tuple, Type, Union
 
 import numpy as np
 from numpy import dtype
+
 # from fusion.shape import shape_extractor
 
 default_type = np.float32
 
-ftype = Union[int, float, np.integer, np.floating, np.ndarray]
+ftype = Union[int, float, list, np.integer, np.floating, np.ndarray]
+
 
 class Function:
     def __init__(self, *tensors: Tensor):
@@ -18,7 +20,7 @@ class Function:
         raise NotImplementedError("forward not implemented")
 
     def backward(self, *args):
-        raise NotImplementedError("backward not implemented")
+        raise RuntimeError("backward not implemented")
 
     # @classmethod provides a way to define methods that operate on the class itself rather than instances of the class.
     # The apply method is used to instantiate and execute the forward pass of the function, returning a tensor representing the result.
@@ -210,12 +212,12 @@ class Tensor:
     def dot(self, other):
         return Dot.apply(self, other)
 
-    # def div(self, other):
-    #     one_div = Tensor(1/other.ndata)
-    #     return self.mul(one_div)
+    def div(self, other):
+        one_div = Tensor(1/other.ndata)
+        return self.mul(one_div)
 
-    # def __truediv__(self, other):
-    #     return self.div(other)
+    def __truediv__(self, other):
+        return self.div(other)
 
     # def pow(self):
     #     return Pow.apply(self, other)

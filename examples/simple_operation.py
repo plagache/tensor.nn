@@ -16,6 +16,9 @@ if __name__ == "__main__":
     # y = Tensor([[0,1,0,4],[0,0,1,7],[1,1,0,8]], requires_grad=True)
 
 
+    div = x / y
+    div.backward()
+    print(div)
     # t = w + y
     # d = t.dot(y.transpose())
     t = Tensor(t)

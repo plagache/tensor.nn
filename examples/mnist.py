@@ -28,11 +28,11 @@ def fetch(url):
     file_path = os.path.join(datasets_path, hashlib.sha1(url.encode('utf-8')).hexdigest())
     isExisting = os.path.exists(file_path)
     if isExisting is True:
-        print(f"{file_path} already exist")
+        # print(f"{file_path} already exist")
         with open(file_path, "rb") as file:
             data = file.read()
     else:
-        print(f"Downloading {file_path}")
+        # print(f"Downloading {file_path}")
         with requests.get(url, stream=True) as response:
             response.raise_for_status()
             with open(file_path, "wb") as file:
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
         return layer.astype(np.float32)
 
-    # create class
+    # create class representing the model
     class neural_network():
         def __init__(self):
             self.layer_1 = Tensor(init_layer(784, hidden_size))
@@ -88,18 +88,21 @@ if __name__ == "__main__":
 
         def forward(self, x):
             output = x.dot(self.layer_1).relu().dot(self.layer_2)
+            # output = x.dot(self.layer_1).relu().dot(self.layer_2).logsoftmax()
             return output
 
 
     batch_size = 100
     steps = 1000
-    learning_rate = 0.001
+    # learning_rate = 0.001
+    learning_rate = Tensor(0.001)
     losses, accuracies = [], []
     for step in (t := tqdm(range(steps))):
         sample = np.random.randint(x_train.shape[0], size=batch_size)  # Randomly select batch_size samples
         model = neural_network()
 
-        output = model.forward(Tensor(x_train[sample].reshape(-1, 28*28)))
+        xs = Tensor(x_train[sample].reshape(-1, 28*28))
+        output = model.forward(xs)
         # print("\noutput :", output)
         # print("\noutput.ndata :", output.ndata)
         # exit()
@@ -107,6 +110,7 @@ if __name__ == "__main__":
         # create the y
         y_sampled = y_train[sample]
         ys = np.zeros((len(sample), number_of_label), np.float32)
+        #encoding the correct label to its place [0,0,0,0,1,0,0,0,0,0]
         ys[range(ys.shape[0]), y_sampled] = 1.0
         ys = Tensor(ys)
         # print("\nys.ndata :", ys.ndata)
@@ -122,9 +126,12 @@ if __name__ == "__main__":
         # print(output.gradient)
         # print(ys.gradient)
 
-        # update the layer
+        # update the layer gradient
+        print(type(model.layer_1.gradient))
         # print(model.layer_1)
         print(model.layer_1.gradient)
         # print(model.layer_2)
         print(model.layer_2.gradient)
+        print(type(learning_rate))
+        model.layer_1.ndata = model.layer_1.ndata - learning_rate * model.layer_1.gradient
         exit()
