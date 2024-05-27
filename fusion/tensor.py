@@ -8,6 +8,7 @@ from numpy import dtype
 
 default_type = np.float32
 
+ftype = Union[int, float, np.integer, np.floating, np.ndarray]
 
 class Function:
     def __init__(self, *tensors: Tensor):
@@ -104,7 +105,8 @@ class Tensor:
     # slots are more efficient in terms of memory space and speed of access, and a bit safer than the default Python method of data access
     # __slots__ = "ndata", "need_gradient", "gradient", "_context"
 
-    def __init__(self, data: Union[int, float, list, np.ndarray], requires_gradient: Optional[bool] = None):
+    # how to handle various type for ndata ?
+    def __init__(self, data: ftype, requires_gradient: Optional[bool] = None):
         # True for parameters training / False for inference / inputs / labels
         self.requires_gradient: Optional[bool] = requires_gradient
 
@@ -116,10 +118,12 @@ class Tensor:
         # _ mean private context
         self._context: Optional[Function] = None
 
-        if isinstance(data, (int, float, np.integer, list)):
+        if not isinstance(data, ftype):
+            raise RuntimeError(f"data of type :{type(data)} is not accepted")
+
+        if isinstance(data, (int, float, list, np.integer, np.floating)):
             if isinstance(data, float):
                 self.ndata = np.array(data, dtype=default_type)
-                # self.ndata = np.array(data, dtype=np.float32)
             else:
                 self.ndata = np.array(data)
             return
@@ -157,7 +161,13 @@ class Tensor:
 
     def backward(self):
         # First gradient is always one
-        self.gradient = Tensor(1, requires_gradient=False)
+        self.gradient = Tensor(np.ones(self.shape), requires_gradient=False)
+        # if self.shape == ():
+        #     self.gradient = Tensor(1, requires_gradient=False)
+        # else:
+        #     print(f"backward can only be perform on scalar value and shape is: {self.shape}")
+        #     return
+
         # self.gradient = Tensor(np.ones_like(self.ndata), requires_gradient=False)
 
         for node in reversed(self.topological_sort()):
@@ -182,6 +192,12 @@ class Tensor:
     def __add__(self, other):
         return self.add(other)
 
+    def sub(self, other):
+        return self.add(-other)
+
+    def __sub__(self, other):
+        return self.sub(other)
+
     def mul(self, other):
         return Mul.apply(self, other)
 
@@ -193,6 +209,20 @@ class Tensor:
 
     def dot(self, other):
         return Dot.apply(self, other)
+
+    # def div(self, other):
+    #     one_div = Tensor(1/other.ndata)
+    #     return self.mul(one_div)
+
+    # def __truediv__(self, other):
+    #     return self.div(other)
+
+    # def pow(self):
+    #     return Pow.apply(self, other)
+
+    def mean(self):
+        one_div = Tensor(np.array([1/self.ndata.size]))
+        return self.sum().mul(one_div)
 
     # def expand(self, shape):
     #     return Expand.apply(self, shape)

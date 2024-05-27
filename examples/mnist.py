@@ -2,13 +2,13 @@ import gzip
 import hashlib
 import os
 
+import matplotlib.pyplot as pyplot
 import numpy as np
 import requests
 from fusion import Tensor
-import matplotlib.pyplot as pyplot
 from tqdm import tqdm
 
-common_url = "http://yann.lecun.com/exdb/mnist/" # not accessible anymore
+common_url = "http://yann.lecun.com/exdb/mnist/"  # not accessible anymore
 google_url = "https://storage.googleapis.com/cvdf-datasets/mnist/"
 datasets_path = "static/datasets/"
 
@@ -68,9 +68,6 @@ if __name__ == "__main__":
     # the 2 next should be the same U_u
     number_of_output = 10
     number_of_label = 10
-    batch_size = 100
-    steps = 1000
-    learning_rate = 0.001
     # h: height of the layer
     # m: probably number of input for each neuron in the layer
     # this function initialize the weight/parameters of our layers
@@ -94,19 +91,40 @@ if __name__ == "__main__":
             return output
 
 
+    batch_size = 100
+    steps = 1000
+    learning_rate = 0.001
+    losses, accuracies = [], []
     for step in (t := tqdm(range(steps))):
         sample = np.random.randint(x_train.shape[0], size=batch_size)  # Randomly select batch_size samples
         model = neural_network()
 
-        x = model.forward(Tensor(x_train[sample].reshape(-1, 28*28)))
+        output = model.forward(Tensor(x_train[sample].reshape(-1, 28*28)))
+        # print("\noutput :", output)
+        # print("\noutput.ndata :", output.ndata)
+        # exit()
 
         # create the y
         y_sampled = y_train[sample]
         ys = np.zeros((len(sample), number_of_label), np.float32)
-        print("\nys :", ys)
-        print("\nx :", x)
-        x.backward()
+        ys[range(ys.shape[0]), y_sampled] = 1.0
+        ys = Tensor(ys)
+        # print("\nys.ndata :", ys.ndata)
+
+        # loss = ((output - ys) ** 2).mean()
+        # loss.backward()
+
         # calculate the loss
+        loss = output.mul(ys).mean()
+        # print(loss)
+        # print(loss._context.parents)
+        loss.backward()
+        # print(output.gradient)
+        # print(ys.gradient)
+
         # update the layer
+        # print(model.layer_1)
         print(model.layer_1.gradient)
+        # print(model.layer_2)
+        print(model.layer_2.gradient)
         exit()
