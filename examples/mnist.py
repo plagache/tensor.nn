@@ -43,26 +43,17 @@ def fetch(url):
 
 
 if __name__ == "__main__":
+    # slicing the offset here
     x_train = fetch(google_url+data_sources["training_images"])[0x10:].reshape(-1, 28, 28)
     y_train = fetch(google_url+data_sources["training_labels"])[8:]
     x_test = fetch(google_url+data_sources["test_images"])[0x10:].reshape(-1, 28, 28)
     y_test = fetch(google_url+data_sources["test_labels"])[8:]
-    index_nbr = 55
-    # plot_mnist(X_train[index_nbr], Y_train[index_nbr])
-    # print(X_train)
-    # print(np.info(X_train))
-    # convert 255 values into floating point
     x_train = x_train / 255
-    # print(X_train[index_nbr])
     x_train = x_train.astype(np.float32)
-    # print(X_train[index_nbr])
-    # print(X_train)
-    # print(np.info(X_train))
-    # print(Tensor(X_train))
-    # print(np.info(X_train))
-    # print(Y_train)
-    # print(np.info(Y_train))
+
     # visualize data with matplolib and compare to label to verify our data
+    # index_nbr = 55
+    # plot_mnist(X_train[index_nbr], Y_train[index_nbr])
 
     hidden_size = 128
     # the 2 next should be the same U_u
@@ -103,35 +94,24 @@ if __name__ == "__main__":
 
         xs = Tensor(x_train[sample].reshape(-1, 28*28))
         output = model.forward(xs)
-        # print("\noutput :", output)
-        # print("\noutput.ndata :", output.ndata)
-        # exit()
 
-        # create the y
+        # create the ys
         y_sampled = y_train[sample]
         ys = np.zeros((len(sample), number_of_label), np.float32)
         #encoding the correct label to its place [0,0,0,0,1,0,0,0,0,0]
         ys[range(ys.shape[0]), y_sampled] = 1.0
         ys = Tensor(ys)
-        # print("\nys.ndata :", ys.ndata)
 
-        # loss = ((output - ys) ** 2).mean()
-        # loss.backward()
 
         # calculate the loss
         loss = output.mul(ys).mean()
-        # print(loss)
-        # print(loss._context.parents)
+        # loss = ((output - ys) ** 2).mean()
         loss.backward()
-        # print(output.gradient)
-        # print(ys.gradient)
 
-        # update the layer gradient
-        print(type(model.layer_1.gradient))
-        # print(model.layer_1)
-        print(model.layer_1.gradient)
-        # print(model.layer_2)
-        print(model.layer_2.gradient)
-        print(type(learning_rate))
-        model.layer_1.ndata = model.layer_1.ndata - learning_rate * model.layer_1.gradient
-        exit()
+        # update parameters
+        model.layer_1.ndata = model.layer_1.ndata - np.multiply(learning_rate.ndata, model.layer_1.gradient.ndata)
+        model.layer_2.ndata = model.layer_2.ndata - np.multiply(learning_rate.ndata, model.layer_2.gradient.ndata)
+
+        # Test accuracy
+
+        t.set_description(f"loss: {loss}")
