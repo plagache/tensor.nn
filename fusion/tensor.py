@@ -90,6 +90,14 @@ class Dot(Function):
         return np.dot(output.ndata, y.ndata.T), np.dot(output.ndata.T, x.ndata).T
 
 
+class Log(Function):
+    def forward(self, x:Tensor):
+        return np.log(x.ndata)
+
+    def backward(self, output: Tensor):
+        x, = self.parents
+        return output.ndata * (1 / x.ndata)
+
 # Movement ops, modify size of Tensor
 # class Expand(Function):
 #     def forward(self, x: Tensor, output_shape: Tuple):
@@ -124,6 +132,8 @@ class Tensor:
             raise RuntimeError(f"data of type :{type(data)} is not accepted")
 
         if isinstance(data, (int, float, list, np.integer, np.floating)):
+            if isinstance(data, int):
+                self.ndata = np.array(data, dtype=np.integer)
             if isinstance(data, float):
                 self.ndata = np.array(data, dtype=default_type)
             else:
@@ -218,6 +228,9 @@ class Tensor:
 
     def __truediv__(self, other):
         return self.div(other)
+
+    def log(self):
+        return Log.apply(self)
 
     # def pow(self):
     #     return Pow.apply(self, other)

@@ -93,25 +93,34 @@ if __name__ == "__main__":
         model = neural_network()
 
         xs = Tensor(x_train[sample].reshape(-1, 28*28))
-        output = model.forward(xs)
 
         # create the ys
         y_sampled = y_train[sample]
         ys = np.zeros((len(sample), number_of_label), np.float32)
-        #encoding the correct label to its place [0,0,0,0,1,0,0,0,0,0]
+        # encoding the correct label to its place [0,0,0,0,1,0,0,0,0,0]
         ys[range(ys.shape[0]), y_sampled] = 1.0
+        # creating the tensor
         ys = Tensor(ys)
 
 
+        output = model.forward(xs)
         # calculate the loss
         loss = output.mul(ys).mean()
         # loss = ((output - ys) ** 2).mean()
         loss.backward()
 
         # update parameters
-        model.layer_1.ndata = model.layer_1.ndata - np.multiply(learning_rate.ndata, model.layer_1.gradient.ndata)
-        model.layer_2.ndata = model.layer_2.ndata - np.multiply(learning_rate.ndata, model.layer_2.gradient.ndata)
+        # model.layer_1.ndata = model.layer_1.ndata - np.multiply(learning_rate.ndata, model.layer_1.gradient.ndata)
+        # model.layer_2.ndata = model.layer_2.ndata - np.multiply(learning_rate.ndata, model.layer_2.gradient.ndata)
+        model.layer_1.ndata = model.layer_1.ndata - (learning_rate.ndata * model.layer_1.gradient.ndata)
+        model.layer_2.ndata = model.layer_2.ndata - (learning_rate.ndata * model.layer_2.gradient.ndata)
 
         # Test accuracy
+        # print(output.ndata)
+        # print(np.info(output.ndata))
+        # prediction = np.maximum(output.ndata, axis=1)
+        # compare prediction and label to get accuracy
+        # print(prediction)
+        exit()
 
         t.set_description(f"loss: {loss}")

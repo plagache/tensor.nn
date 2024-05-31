@@ -3,12 +3,15 @@ Fusion of different machine learning tools
 
 
 ## Objectives
-Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a tensor class based on numpy.
+Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a tensor class.
+A Tensor being a multidimensional array, in our case based on numpy ndarray.
 
 - Build and train a small neural network to detect handwritten digits
-    - [x] Relu / maybe a problem with backward
+    - [x] Relu
     - [x] dot
-    - [ ] logsoftmax
+    - [ ] log
+    - [ ] exp
+    - [ ] pow
 
 ## ToDo
 
@@ -25,20 +28,24 @@ Create a machine learning framework based on the [micrograd](https://github.com/
 - [ ] graphviz of the network / topological sort / important for comprehension of architecture
 - [ ] Statistics / describe of data
 - [ ] Plot
+- [ ] Test
+    - [ ] dot testing
+    - [ ] Ensure Type matching
+    - [ ] different type
 
 
 ## Details
 
 the base for this project to work are 2 class:
 - Function:
-    - subclass(Function): specify forward and backward for a given ops
+    - subclass(Function): specify forward and backward for a given operation
     - \*tensors parents: needed for topological sort
     - apply:
         - create & assign \_context
         - return new Tensor based on forward
 - Tensor :
-    - data
-    - gradient
+    - data : type[numpy array]
+    - gradient : type[Tensor]
     - \_context : type[Function]/ops, \*parents tensors
 
 we have made an example in [Functionnement](examples/simple_function.py)
