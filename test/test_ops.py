@@ -4,116 +4,82 @@ from fusion import Tensor
 from tinygrad.tensor import Tensor as Tiny_Tensor
 # from tinygrad.dtype import dtypes
 
+def test_compare_tinygrad(self, x_np, y_np):
+    x = Tensor(x_np)
+    y = Tensor(y_np)
+    mul = x * y
+    add = mul + x
+    relu = add.relu()
+    sum = relu.sum()
+    sum.backward()
+    sum_gradient = sum.gradient.ndata
+    relu_gradient = relu.gradient.ndata
+    add_gradient = add.gradient.ndata
+    mul_gradient = mul.gradient.ndata
+    x_gradient = x.gradient.ndata
+    y_gradient = y.gradient.ndata
+
+    # x_tiny = Tiny_Tensor(x_val, requires_grad=True, dtype=dtypes.int)
+    # y_tiny = Tiny_Tensor(y_val, requires_grad=True, dtype=dtypes.int)
+    tiny_x = Tiny_Tensor(x_np, requires_grad=True)
+    tiny_y = Tiny_Tensor(y_np, requires_grad=True)
+    tiny_mul = tiny_x * tiny_y
+    tiny_add = tiny_mul + tiny_x
+    tiny_relu = tiny_add.relu()
+    tiny_sum = tiny_relu.sum()
+    tiny_sum.backward()
+    tiny_sum_gradient = tiny_sum.grad.numpy()
+    tiny_relu_gradient = tiny_relu.grad.numpy()
+    tiny_add_gradient = tiny_add.grad.numpy()
+    tiny_mul_gradient = tiny_mul.grad.numpy()
+    tiny_x_gradient = tiny_x.grad.numpy()
+    tiny_y_gradient = tiny_y.grad.numpy()
+
+    # print(np.info(sum.ndata))
+    # print(np.info(tiny_sum.numpy()))
+    # print(sum.ndata, tiny_sum.numpy())
+    # self.assertAlmostEqual(sum.ndata, tiny_sum.numpy(), precision)
+    # print(relu.ndata, tiny_relu.numpy())
+    np.testing.assert_allclose(sum.ndata, tiny_sum.numpy())
+    np.testing.assert_allclose(relu.ndata, tiny_relu.numpy())
+    np.testing.assert_allclose(add.ndata, tiny_add.numpy())
+    np.testing.assert_allclose(mul.ndata, tiny_mul.numpy())
+
+    # print(f"x_gradient:{x_gradient}\ntiny_x_gradient:{tiny_x_gradient}\n")
+    # print(f"\nsum_gradient:\n{sum_gradient}\n----\n{tiny_sum_gradient}")
+    # print(f"\nrelu_gradient:\n{relu_gradient}\n----\n{tiny_relu_gradient}")
+    # print(f"\nadd_gradient:\n{add_gradient}\n----\n{tiny_add_gradient}")
+    # print(f"\nmul_gradient:\n{mul_gradient}\n----\n{tiny_mul_gradient}")
+    # print(f"\nx_gradient:\n{x_gradient}\n----\n{tiny_x_gradient}")
+    # print(f"\ny_gradient:\n{y_gradient}\n----\n{tiny_y_gradient}")
+    np.testing.assert_allclose(sum_gradient, tiny_sum_gradient)
+    np.testing.assert_allclose(relu_gradient, tiny_relu_gradient)
+    np.testing.assert_allclose(add_gradient, tiny_add_gradient)
+    np.testing.assert_allclose(mul_gradient, tiny_mul_gradient)
+    np.testing.assert_allclose(x_gradient, tiny_x_gradient)
+    np.testing.assert_allclose(y_gradient, tiny_y_gradient)
+
+
 
 class test_gradient(unittest.TestCase):
-    def test_compare_tinygrad_on_random_int(self):
-        # x_np = np.random.random_sample(size=(3, 3))
-        # y_np = np.random.random_sample(size=(3, 3))
+    def test_multiple_type(self):
+
+        x_np = np.random.randint(-9, 9, size=(3, 3))
+        y_np = np.random.randint(-9, 9, size=(3, 3))
+        # print(x_np)
+        # print(y_np)
+        # print(np.info(x_np))
+        # print(np.info(y_np))
+        test_compare_tinygrad(self, x_np, y_np)
+
         x_np = np.random.uniform(-9, 9, size=(3, 3))
         y_np = np.random.uniform(-9, 9, size=(3, 3))
         # print(x_np)
         # print(y_np)
         # print(np.info(x_np))
         # print(np.info(y_np))
+        test_compare_tinygrad(self, x_np, y_np)
 
-        x = Tensor(x_np)
-        y = Tensor(y_np)
-        mul = x * y
-        add = mul + x
-        relu = add.relu()
-        sum = relu.sum()
-        sum.backward()
-        sum_gradient    = sum.gradient.ndata
-        relu_gradient   = relu.gradient.ndata
-        add_gradient    = add.gradient.ndata
-        mul_gradient    = mul.gradient.ndata
-        x_gradient      = x.gradient.ndata
-        y_gradient      = y.gradient.ndata
-
-        # x_tiny = Tiny_Tensor(x_val, requires_grad=True, dtype=dtypes.int)
-        # y_tiny = Tiny_Tensor(y_val, requires_grad=True, dtype=dtypes.int)
-        tiny_x = Tiny_Tensor(x_np, requires_grad=True)
-        tiny_y = Tiny_Tensor(y_np, requires_grad=True)
-        tiny_mul = tiny_x * tiny_y
-        tiny_add = tiny_mul + tiny_x
-        tiny_relu = tiny_add.relu()
-        tiny_sum = tiny_relu.sum()
-        tiny_sum.backward()
-        tiny_sum_gradient    = tiny_sum.grad.numpy()
-        tiny_relu_gradient   = tiny_relu.grad.numpy()
-        tiny_add_gradient    = tiny_add.grad.numpy()
-        tiny_mul_gradient    = tiny_mul.grad.numpy()
-        tiny_x_gradient      = tiny_x.grad.numpy()
-        tiny_y_gradient      = tiny_y.grad.numpy()
-
-        # print(np.info(sum.ndata))
-        # print(np.info(tiny_sum.numpy()))
-        # print(sum.ndata, tiny_sum.numpy())
-        # self.assertAlmostEqual(sum.ndata, tiny_sum.numpy(), precision)
-        # print(relu.ndata, tiny_relu.numpy())
-        np.testing.assert_allclose(sum.ndata, tiny_sum.numpy())
-        np.testing.assert_allclose(relu.ndata, tiny_relu.numpy())
-        np.testing.assert_allclose(add.ndata, tiny_add.numpy())
-        np.testing.assert_allclose(mul.ndata, tiny_mul.numpy())
-
-        # print(f"\nx_gradient:{x_gradient}\ntiny_x_gradient:{tiny_x_gradient}\n")
-        # print(f"\nsum_gradient:\n{sum_gradient}\n----\n{tiny_sum_gradient}")
-        # print(f"\nrelu_gradient:\n{relu_gradient}\n----\n{tiny_relu_gradient}")
-        # print(f"\nadd_gradient:\n{add_gradient}\n----\n{tiny_add_gradient}")
-        # print(f"\nmul_gradient:\n{mul_gradient}\n----\n{tiny_mul_gradient}")
-        # print(f"\nx_gradient:\n{x_gradient}\n----\n{tiny_x_gradient}")
-        # print(f"\ny_gradient:\n{y_gradient}\n----\n{tiny_y_gradient}")
-        np.testing.assert_allclose(sum_gradient, tiny_sum_gradient)
-        np.testing.assert_allclose(relu_gradient, tiny_relu_gradient)
-        np.testing.assert_allclose(add_gradient, tiny_add_gradient)
-        np.testing.assert_allclose(mul_gradient, tiny_mul_gradient)
-        np.testing.assert_allclose(x_gradient, tiny_x_gradient)
-        np.testing.assert_allclose(y_gradient, tiny_y_gradient)
-
-
-    # def test_compare_tinygrad_on_float32(self):
-    #     x_val = np.random.random_sample(size=(3, 3)).tolist()
-    #     y_val = np.random.random_sample(size=(3, 3)).tolist()
-    #
-    #     x = Tensor(x_val)
-    #     y = Tensor(y_val)
-    #     w = x * y
-    #     v = w + y
-    #     z = v.sum()
-    #     z.backward()
-    #     z_gradient = z.gradient.ndata
-    #     v_gradient = v.gradient.ndata
-    #     w_gradient = w.gradient.ndata
-    #     x_gradient = x.gradient.ndata
-    #     y_gradient = y.gradient.ndata
-    #
-    #     x_tiny = Tiny_Tensor(x_val, requires_grad=True)
-    #     y_tiny = Tiny_Tensor(y_val, requires_grad=True)
-    #     w_tiny = x_tiny * y_tiny
-    #     v_tiny = w_tiny + y_tiny
-    #     z_tiny = v_tiny.sum()
-    #     z_tiny.backward()
-    #     z_tiny_grad = z_tiny.grad.numpy()
-    #     v_tiny_grad = v_tiny.grad.numpy()
-    #     w_tiny_grad = w_tiny.grad.numpy()
-    #     x_tiny_grad = x_tiny.grad.numpy()
-    #     y_tiny_grad = y_tiny.grad.numpy()
-    #
-    #     print(f"\n{z.ndata.dtype}")
-    #     print(z_tiny.numpy().dtype)
-    #     print(z.ndata)
-    #     print(z_tiny.numpy())
-    #     print(f"\n{x_gradient.dtype}")
-    #     print(f"{x_tiny_grad.dtype}")
-    #     print(f"{x_gradient}")
-    #     print(f"{x_tiny_grad}")
-    #     assert z.ndata == z_tiny.numpy()
-    #     assert x_gradient.dtype == x_tiny_grad.dtype
-    #     assert x_gradient.tolist() == x_tiny_grad.tolist()
-    #     assert y_gradient.tolist() == y_tiny_grad.tolist()
-    #     assert w_gradient.tolist() == w_tiny_grad.tolist()
-    #     assert v_gradient.tolist() == v_tiny_grad.tolist()
-    #     assert z_gradient.tolist() == z_tiny_grad.tolist()
 
 if __name__ == "__main__":
     unittest.main()
