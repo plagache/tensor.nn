@@ -190,8 +190,9 @@ class Tensor:
             else:
                 gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
-                    # parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
-                    parent.gradient = gradient
+                    # if a Tensor is used multiple time in our graph, we add gradient
+                    parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
+                    # parent.gradient = gradient
             del node._context
         return self
 

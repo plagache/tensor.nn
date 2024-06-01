@@ -9,7 +9,9 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 - Build and train a small neural network to detect handwritten digits
     - [x] Relu
     - [x] dot
+    - [ ] div
     - [ ] log
+        - [ ] how to handle log(0)
     - [ ] exp
     - [ ] pow
 
@@ -29,8 +31,8 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 - [ ] Statistics / describe of data
 - [ ] Plot
 - [ ] Test
-    - [ ] dot testing
-    - [ ] Ensure Type matching
+    - [ ] machine learning operations / mean / logsoftmax / etc
+    - [ ] Ensure Type matching (dtype)
     - [ ] different type
 
 
