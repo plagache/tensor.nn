@@ -8,6 +8,8 @@ from numpy import dtype
 # from fusion.shape import shape_extractor
 
 default_type = np.float32
+default_float = np.float32
+default_int = np.int32
 
 ftype = Union[int, float, list, np.integer, np.floating, np.ndarray]
 
@@ -34,22 +36,22 @@ class Function:
 
 
 class Sum(Function):
-    def forward(self, input: Tensor):
-        return np.sum(input.ndata)
+    def forward(self, x: Tensor):
+        return np.sum(x.ndata)
 
     def backward(self, output: Tensor):
         # this line unpack the tuple of (*self.parents)
-        x, = self.parents
+        (x,) = self.parents
         return np.ones(x.shape) * output.ndata
         # return np.ones_like(x.ndata) * output.ndata
 
 
 class Relu(Function):
-    def forward(self, input:Tensor):
-        return np.maximum(input.ndata, 0)
+    def forward(self, x: Tensor):
+        return np.maximum(x.ndata, 0)
 
     def backward(self, output: Tensor):
-        x, = self.parents
+        (x,) = self.parents
         output_gradient = np.copy(output.ndata)
         output_gradient[x.ndata <= 0] = 0
         return output_gradient
@@ -69,7 +71,7 @@ class Mul(Function):
 
     def backward(self, output: Tensor):
         x, y = self.parents
-        return output.ndata * y.ndata, output.ndata * x.ndata
+        return y.ndata * output.ndata, x.ndata * output.ndata
 
 
 class Dot(Function):
@@ -91,12 +93,25 @@ class Dot(Function):
 
 
 class Log(Function):
-    def forward(self, x:Tensor):
+    def forward(self, x: Tensor):
         return np.log(x.ndata)
 
     def backward(self, output: Tensor):
-        x, = self.parents
-        return output.ndata * (1 / x.ndata)
+        (x,) = self.parents
+        return (1 / x.ndata) * output.ndata
+
+
+class Pow(Function):
+    def forward(self, x: Tensor, power):
+        print(type(power))
+        print(type(x.ndata))
+        # return x.ndata ** power
+        return np.power(x.ndata, power)
+
+    def backward(self, output: Tensor):
+        x, power = self.parents
+        return (power * np.power(x.ndata, (power - 1))) * output.ndata
+
 
 # Movement ops, modify size of Tensor
 # class Expand(Function):
@@ -190,9 +205,13 @@ class Tensor:
             else:
                 gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
-                    # if a Tensor is used multiple time in our graph, we add gradient
-                    parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
-                    # parent.gradient = gradient
+                # if a Tensor is used multiple time in our graph, we add gradient
+                print(type(gradient))
+                print(gradient)
+                print(type(parent.gradient))
+                print(parent.gradient)
+                parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
+                # parent.gradient = gradient
             del node._context
         return self
 
@@ -224,7 +243,7 @@ class Tensor:
         return Dot.apply(self, other)
 
     def div(self, other):
-        one_div = Tensor(1/other.ndata)
+        one_div = Tensor(1 / other.ndata)
         return self.mul(one_div)
 
     def __truediv__(self, other):
@@ -233,11 +252,14 @@ class Tensor:
     def log(self):
         return Log.apply(self)
 
-    # def pow(self):
-    #     return Pow.apply(self, other)
+    def pow(self, power):
+        return Pow.apply(self, power)
+
+    def __pow__(self, power):
+        return self.pow(power)
 
     def mean(self):
-        one_div = Tensor(np.array([1/self.ndata.size]))
+        one_div = Tensor(np.array([1 / self.ndata.size]))
         return self.sum().mul(one_div)
 
     # def expand(self, shape):
@@ -248,7 +270,7 @@ class Tensor:
         return self
 
     def __getattr__(self, name):
-        if name == 'T':
+        if name == "T":
             return self.transpose()
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 

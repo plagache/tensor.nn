@@ -25,7 +25,7 @@ def plot_mnist(image, title):
     pyplot.show()
 
 def fetch(url):
-    file_path = os.path.join(datasets_path, hashlib.sha1(url.encode('utf-8')).hexdigest())
+    file_path = os.path.join(datasets_path, hashlib.md5(url.encode('utf-8')).hexdigest())
     isExisting = os.path.exists(file_path)
     if isExisting is True:
         # print(f"{file_path} already exist")

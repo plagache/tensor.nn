@@ -14,6 +14,7 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
         - [ ] how to handle log(0)
     - [ ] exp
     - [ ] pow
+        - how do we not compute gradient for parent that is the power ?
 
 ## ToDo
 
@@ -31,6 +32,7 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 - [ ] Statistics / describe of data
 - [ ] Plot
 - [ ] Test
+    - [ ] what happen if we do operations with another instance than Tensor ? >> we should create a new instance
     - [ ] machine learning operations / mean / logsoftmax / etc
     - [ ] Ensure Type matching (dtype)
     - [ ] different type

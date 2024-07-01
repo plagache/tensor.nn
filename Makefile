@@ -59,6 +59,9 @@ test:
 function:
 	${PYTHON} examples/simple_function.py \
 
+kernel:
+	DEBUG=5 NOOPT=1 ${PYTHON} examples/kernel.py
+
 static:
 	mkdir -p static/datasets
 
