@@ -1,5 +1,4 @@
 numpy
-tinygrad==0.9.0
 matplotlib
 tqdm
 ipython
