@@ -5,11 +5,16 @@ PYTHON = ${BIN}/python3.11
 PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
-PROGRAMS = examples
-SIMPLE_OPS = ${PROGRAMS}/simple_operation.py
-MNIST = ${PROGRAMS}/mnist.py
+EXAMPLES = examples
+PROGRAMS = simple_operation.py
+# PROGRAMS = simple_function.py
+# PROGRAMS = mnist.py
+# PROGRAMS = mlp.py
 
 # ARGUMENTS =
+
+
+### SETUP ###
 
 setup: venv pip_upgrade install
 
@@ -26,10 +31,16 @@ install: \
 
 #
 module: setup.py
-	${PIP} install -e . --upgrade
+	${PIP} install -e '.' --upgrade
 
 requirements: requirements.txt
 	${PIP} install -r requirements.txt --upgrade
+
+static:
+	mkdir -p static/datasets
+
+
+### INFO ###
 
 list:
 	${PIP} list
@@ -42,28 +53,26 @@ size:
 	du -hd 0 ${VENV}
 
 run:
-	${PYTHON} ${SIMPLE_OPS} \
+	${PYTHON} ${EXAMPLES}/${PROGRAMS} \
 	# ${ARGUMENTS}
 
 #
-mnist: static
-	${PYTHON} ${MNIST} \
-	# ${ARGUMENTS}
+
+
+### TEST ###
+
+test_module: setup.py
+	${PIP} install -e '.[testing]' --upgrade
+
+unittest:
+	${PYTHON} -m unittest discover test \
+	# ${PYTHON} test/test_ops.py \
+	# -v
 
 #
-test:
-	${PYTHON} test/test_ops.py \
-	-v
 
-#
-function:
-	${PYTHON} examples/simple_function.py \
 
-kernel:
-	DEBUG=5 NOOPT=1 ${PYTHON} examples/kernel.py
-
-static:
-	mkdir -p static/datasets
+### HOUSECLEANING ###
 
 clean:
 	rm -rf static/
