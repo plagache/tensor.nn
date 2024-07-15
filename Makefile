@@ -1,3 +1,4 @@
+# Variables
 SYSTEM_PYTHON = /usr/bin/python3.11
 VENV = .venv
 BIN = ${VENV}/bin
@@ -14,8 +15,7 @@ PROGRAMS = simple_operation.py
 # ARGUMENTS =
 
 
-### SETUP ###
-
+# Setup
 setup: venv pip_upgrade install
 
 venv:
@@ -40,8 +40,7 @@ static:
 	mkdir -p static/datasets
 
 
-### INFO ###
-
+# Info
 list:
 	${PIP} list
 
@@ -52,6 +51,7 @@ size:
 	du -hd 0
 	du -hd 0 ${VENV}
 
+# Run
 run:
 	${PYTHON} ${EXAMPLES}/${PROGRAMS} \
 	# ${ARGUMENTS}
@@ -59,12 +59,11 @@ run:
 #
 
 
-### TEST ###
-
+# Test
 test_module: setup.py
 	${PIP} install -e '.[testing]' --upgrade
 
-unittest:
+test:
 	${PYTHON} -m unittest discover test \
 	# ${PYTHON} test/test_ops.py \
 	# -v
@@ -72,8 +71,7 @@ unittest:
 #
 
 
-### HOUSECLEANING ###
-
+# Clean
 clean:
 	rm -rf static/
 

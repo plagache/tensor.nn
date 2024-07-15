@@ -16,7 +16,7 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
     - [ ] pow
         - how do we not compute gradient for parent that is the power ?
 
-## ToDo
+## To-do
 
 - [ ] Tensor class / Automatic differentiation
     - [x] Simple derivatives with context (what created the next value / parent / operation)
@@ -27,7 +27,7 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
     - [ ] SGD
     - [ ] ADAM
 - [ ] Math
-    - [ ] Advenced math function with scikit
+    - [ ] Advanced math function with scikit
 - [ ] graphviz of the network / topological sort / important for comprehension of architecture
 - [ ] Statistics / describe of data
 - [ ] Plot
