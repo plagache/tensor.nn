@@ -18,6 +18,8 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 
 ## To-do
 
+- [ ] Sampler class, provide __iter__() methode, return length of batches
+
 - [ ] Tensor class / Automatic differentiation
     - [x] Simple derivatives with context (what created the next value / parent / operation)
     - [x] Backpropagation with topological sort based on Chain of rules

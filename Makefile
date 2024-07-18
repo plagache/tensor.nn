@@ -7,10 +7,11 @@ PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
 EXAMPLES = examples
-PROGRAMS = simple_operation.py
+
+# PROGRAMS = simple_operation.py
 # PROGRAMS = simple_function.py
 # PROGRAMS = mnist.py
-# PROGRAMS = mlp.py
+PROGRAMS = mlp.py
 
 # ARGUMENTS =
 
@@ -52,7 +53,7 @@ size:
 	du -hd 0 ${VENV}
 
 # Run
-run:
+run: static
 	${PYTHON} ${EXAMPLES}/${PROGRAMS} \
 	# ${ARGUMENTS}
 
