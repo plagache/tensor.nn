@@ -6,33 +6,39 @@ Fusion of different machine learning tools
 Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a tensor class.
 A Tensor being a multidimensional array, in our case based on numpy ndarray.
 
-- Build and train a small neural network to detect handwritten digits
-    - [x] Relu
+- Build small machine learning framework to complete the MLP project of 42
     - [x] dot
-    - [ ] div
     - [ ] log
         - [ ] how to handle log(0)
+- Build and train a small neural network to detect handwritten digits
+    - [x] Relu
+    - [ ] div
     - [ ] exp
     - [ ] pow
         - how do we not compute gradient for parent that is the power ?
 
 ## To-do
 
+I should try to reduce code to a minimum of features,
+if you want hardware optimization and lazyness you should use [tinygrad](https://github.com/tinygrad/tinygrad)
+
 - [ ] Sampler class, provide __iter__() methode, return length of batches
 
 - [ ] Tensor class / Automatic differentiation
     - [x] Simple derivatives with context (what created the next value / parent / operation)
     - [x] Backpropagation with topological sort based on Chain of rules
-    - [ ] lazyness
 - [ ] Optimizer
     - [ ] GD
     - [ ] SGD
     - [ ] ADAM
+- [ ] graphviz of the network / topological sort / important for comprehension of architecture
 - [ ] Math
     - [ ] Advanced math function with scikit
-- [ ] graphviz of the network / topological sort / important for comprehension of architecture
-- [ ] Statistics / describe of data
-- [ ] Plot
+
+- [ ] Module DATA VIZ
+    - [ ] Statistics / describe of data
+    - [ ] Plot
+        - [ ] create a small website with dash or bokeh to plot things
 - [ ] Test
     - [ ] what happen if we do operations with another instance than Tensor ? >> we should create a new instance
     - [ ] machine learning operations / mean / logsoftmax / etc

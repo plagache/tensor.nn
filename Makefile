@@ -11,9 +11,11 @@ EXAMPLES = examples
 # PROGRAMS = simple_operation.py
 # PROGRAMS = simple_function.py
 # PROGRAMS = mnist.py
-PROGRAMS = mlp.py
+MLP = examples/mlp
+PROGRAMS = mlp/mlp_train.py
+DATA = examples/
 
-# ARGUMENTS =
+ARGUMENTS = ${MLP}/data.csv
 
 
 # Setup
@@ -55,7 +57,7 @@ size:
 # Run
 run: static
 	${PYTHON} ${EXAMPLES}/${PROGRAMS} \
-	# ${ARGUMENTS}
+	${ARGUMENTS}
 
 #
 
