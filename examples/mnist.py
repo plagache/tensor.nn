@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 common_url = "http://yann.lecun.com/exdb/mnist/"  # not accessible anymore
 google_url = "https://storage.googleapis.com/cvdf-datasets/mnist/"
-datasets_path = "static/datasets/"
+datasets_path = "datasets/"
 
 data_sources = {
     "training_images": "train-images-idx3-ubyte.gz",

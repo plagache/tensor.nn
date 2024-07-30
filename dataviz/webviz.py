@@ -21,17 +21,17 @@ if __name__ == "__main__":
 
     # creating a new columns ys with 1 representing Malign and 0 representing Benign Cells
     dataset = dataset.with_columns(pl.col("M").map_elements(lambda x: 1 if x == "M" else 0, float).alias("ys"))
-    # numerical_dataset = dataset.select(pl.col(pl.NUMERIC_DTYPES))
-    numerical_dataset = dataset.select(cs.numeric())
+    # dataset = dataset.select(pl.col(pl.NUMERIC_DTYPES))
+    dataset = dataset.select(cs.numeric())
 
-    numerical_dataset.plot.scatter()
-    print(type(numerical_dataset.plot.scatter()))
-    print(type(numerical_dataset.plot))
+    dataset.plot.scatter()
+    print(type(dataset.plot.scatter()))
+    print(type(dataset.plot))
     # hvplot.extension('matplotlib')
     # hvplot.extension('plotly')
-    # fig = numerical_dataset.plot.scatter()
-    # fig = px.scatter(numerical_dataset)
-    # features = numerical_dataset.columns
+    # fig = dataset.plot.scatter()
+    # fig = px.scatter(dataset)
+    # features = dataset.columns
     # features_pairs = [(feature, list(filter(lambda x: x != feature, features))) for feature in features]
     # for given_feature, other_features in features_pairs:
     #     for other_feature in other_features:
@@ -47,10 +47,10 @@ if __name__ == "__main__":
             # pyplot.legend(loc="best")
             # pyplot.show()
     exit()
-    for column in numerical_dataset.columns:
-        fig = pyplot.scatter(numerical_dataset)
+    for column in dataset.columns:
+        fig = pyplot.scatter(dataset)
         fig.show()
 
     print(dataset)
     print(dataset.describe())
-    print(numerical_dataset)
+    print(dataset)

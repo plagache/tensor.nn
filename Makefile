@@ -1,4 +1,4 @@
-# Variables
+### Variables
 SYSTEM_PYTHON = /usr/bin/python3.11
 VENV = .venv
 BIN = ${VENV}/bin
@@ -6,19 +6,19 @@ PYTHON = ${BIN}/python3.11
 PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
-EXAMPLES = examples
+EXAMPLES_DIR = examples/
+# EXAMPLE = simple_operation.py
+# EXAMPLE = simple_function.py
+# EXAMPLE = mnist.py
+EXAMPLE = mlp_train.py
+PROGRAM = ${EXAMPLES_DIR}${EXAMPLE}
 
-# PROGRAMS = simple_operation.py
-# PROGRAMS = simple_function.py
-# PROGRAMS = mnist.py
-MLP = examples/mlp
-PROGRAMS = mlp/mlp_train.py
-DATA = examples/
-
-ARGUMENTS = ${MLP}/data.csv
+DATASETS_DIR = datasets/
+DATASET = mlp.csv
+ARGUMENTS = ${DATASETS_DIR}${DATASET}
 
 
-# Setup
+### Setup
 setup: venv pip_upgrade install
 
 venv:
@@ -39,11 +39,8 @@ module: setup.py
 requirements: requirements.txt
 	${PIP} install -r requirements.txt --upgrade
 
-static:
-	mkdir -p static/datasets
 
-
-# Info
+### Info
 list:
 	${PIP} list
 
@@ -54,15 +51,16 @@ size:
 	du -hd 0
 	du -hd 0 ${VENV}
 
-# Run
-run: static
-	${PYTHON} ${EXAMPLES}/${PROGRAMS} \
+
+### Run
+run:
+	${PYTHON} ${PROGRAM} \
 	${ARGUMENTS}
 
 #
 
 
-# Test
+### Test
 test_module: setup.py
 	${PIP} install -e '.[testing]' --upgrade
 
@@ -74,9 +72,8 @@ test:
 #
 
 
-# Clean
+### Clean
 clean:
-	rm -rf static/
 
 fclean: clean
 	rm -rf ${VENV}
