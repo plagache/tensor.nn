@@ -14,7 +14,7 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 - Build and train a small neural network to detect handwritten digits
     - [x] Relu
     - [ ] div
-    - [ ] exp
+    - [ ] exp / test the exp result
     - [ ] pow
         - how do we not compute gradient for parent that is the power ?
 

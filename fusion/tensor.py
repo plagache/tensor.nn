@@ -103,8 +103,8 @@ class Log(Function):
 
 class Pow(Function):
     def forward(self, x: Tensor, power):
-        print(type(power))
-        print(type(x.ndata))
+        # print(type(power))
+        # print(type(x.ndata))
         # return x.ndata ** power
         return np.power(x.ndata, power)
 
@@ -113,14 +113,15 @@ class Pow(Function):
         return (power * np.power(x.ndata, (power - 1))) * output.ndata
 
 
+class Exp(Function):
+    def forward(self, x: Tensor):
+        return np.exp(x.ndata)
 
-# class Exp(Function):
-#     def forward(self, x: Tensor):
-#         return np.exp(x.ndata)
-#
-#     def backward(self, output: Tensor):
-#
-#
+    def backward(self, output: Tensor):
+        (x,) = self.parents
+        return np.exp(x.ndata) * np.log(x.ndata)
+
+
 # class Sigmoid(Function):
 #     def forward(self, x: Tensor):
 #         return 1 / (1 + np.exp(x.ndata * -1))
@@ -219,10 +220,10 @@ class Tensor:
                 gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                 # if a Tensor is used multiple time in our graph, we add gradient
-                print(type(gradient))
-                print(gradient)
-                print(type(parent.gradient))
-                print(parent.gradient)
+                # print(type(gradient))
+                # print(gradient)
+                # print(type(parent.gradient))
+                # print(parent.gradient)
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
                 # parent.gradient = gradient
             del node._context
@@ -278,8 +279,8 @@ class Tensor:
         one_div = Tensor(np.array([1 / self.ndata.size]))
         return self.sum().mul(one_div)
 
-    # def exp(self):
-    #     return Exp.apply(self)
+    def exp(self):
+        return Exp.apply(self)
 
     # def sigmoid(self):
     #     return self.
