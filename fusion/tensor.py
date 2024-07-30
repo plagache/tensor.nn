@@ -113,6 +113,19 @@ class Pow(Function):
         return (power * np.power(x.ndata, (power - 1))) * output.ndata
 
 
+
+# class Exp(Function):
+#     def forward(self, x: Tensor):
+#         return np.exp(x.ndata)
+#
+#     def backward(self, output: Tensor):
+#
+#
+# class Sigmoid(Function):
+#     def forward(self, x: Tensor):
+#         return 1 / (1 + np.exp(x.ndata * -1))
+
+
 # Movement ops, modify size of Tensor
 # class Expand(Function):
 #     def forward(self, x: Tensor, output_shape: Tuple):
@@ -224,6 +237,9 @@ class Tensor:
     def __add__(self, other):
         return self.add(other)
 
+    def __neg__(self):
+        return self.mul(-1)
+
     def sub(self, other):
         return self.add(-other)
 
@@ -261,6 +277,13 @@ class Tensor:
     def mean(self):
         one_div = Tensor(np.array([1 / self.ndata.size]))
         return self.sum().mul(one_div)
+
+    # def exp(self):
+    #     return Exp.apply(self)
+
+    # def sigmoid(self):
+    #     return self.
+    #     return Sigmoid.apply(self)
 
     # def expand(self, shape):
     #     return Expand.apply(self, shape)

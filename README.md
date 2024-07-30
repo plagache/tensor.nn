@@ -8,6 +8,7 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 
 - Build small machine learning framework to complete the MLP project of 42
     - [x] dot
+    - [ ] softmax
     - [ ] log
         - [ ] how to handle log(0)
 - Build and train a small neural network to detect handwritten digits
