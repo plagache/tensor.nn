@@ -11,6 +11,8 @@ if __name__ == "__main__":
     # print(args.dataset)
     dataset = pl.read_csv(args.dataset)
     xs = dataset.drop("M")
+    # print(xs)
+    xs = Tensor(xs.to_numpy())
     print(xs)
 
     # creating a new columns ys with 1 representing Malign and 0 representing Benign Cells
