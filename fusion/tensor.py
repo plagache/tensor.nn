@@ -119,7 +119,7 @@ class Exp(Function):
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        return np.exp(x.ndata) * np.log(x.ndata)
+        return np.exp(x.ndata) * output.ndata
 
 
 # class Sigmoid(Function):
@@ -158,7 +158,7 @@ class Tensor:
         self._context: Optional[Function] = None
 
         if not isinstance(data, ftype):
-            raise RuntimeError(f"data of type :{type(data)} is not accepted")
+            raise RuntimeError(f"data of type :{type(data)} is not supported")
 
         if isinstance(data, (int, float, list, np.integer, np.floating)):
             if isinstance(data, int):

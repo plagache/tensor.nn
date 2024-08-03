@@ -9,19 +9,23 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 - Build small machine learning framework to complete the MLP project of 42
     - [x] dot
     - [ ] softmax
-    - [ ] log
-        - [ ] how to handle log(0)
+    - [x] log
 - Build and train a small neural network to detect handwritten digits
     - [x] Relu
-    - [ ] div
-    - [ ] exp / test the exp result
-    - [ ] pow
+    - [x] div
+    - [x] exp
+    - [x] pow
         - how do we not compute gradient for parent that is the power ?
 
 ## To-do
 
 I should try to reduce code to a minimum of features,
 if you want hardware optimization and lazyness you should use [tinygrad](https://github.com/tinygrad/tinygrad)
+
+- TEST specifique case
+    - [ ] exp(x) = inf WHERE x is big and positive
+    - [ ] log(0) = -inf
+    - [ ] 1/x WHERE x == 0
 
 - [ ] Sampler class, provide __iter__() methode, return length of batches
 

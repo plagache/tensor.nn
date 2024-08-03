@@ -5,8 +5,8 @@ from fusion import Tensor
 from tinygrad.tensor import Tensor as Tiny_Tensor
 # from tinygrad.dtype import dtypes
 
-def test_compare_tinygrad(self, x_np, y_np, precision = None):
 
+def test_compare_tinygrad(self, x_np, y_np, precision=None):
     if precision is not None:
         decimal = precision
     else:
@@ -19,7 +19,7 @@ def test_compare_tinygrad(self, x_np, y_np, precision = None):
     add = mul + x
     relu = add.relu()
     # pow = relu.pow(Tensor(2))
-    pow = relu ** 2
+    pow = relu**2
     sum = pow.sum()
     # sum = relu.sum()
     sum.backward()
@@ -38,7 +38,7 @@ def test_compare_tinygrad(self, x_np, y_np, precision = None):
     tiny_mul = tiny_x * tiny_y
     tiny_add = tiny_mul + tiny_x
     tiny_relu = tiny_add.relu()
-    tiny_pow = tiny_relu ** 2
+    tiny_pow = tiny_relu**2
     tiny_sum = tiny_pow.sum()
     # tiny_sum = tiny_relu.sum()
     tiny_sum.backward()
@@ -80,10 +80,8 @@ def test_compare_tinygrad(self, x_np, y_np, precision = None):
     np.testing.assert_allclose(y_gradient, tiny_y_gradient)
 
 
-
 class test_gradient(unittest.TestCase):
     def test_multiple_type(self):
-
         precision = 1e-04
 
         x_np = np.random.randint(-9, 9, size=(3, 3))
@@ -109,6 +107,7 @@ class test_gradient(unittest.TestCase):
         # print(np.info(x_np))
         # print(np.info(y_np))
         # test_compare_tinygrad(self, x_np, y_np, precision)
+
 
 if __name__ == "__main__":
     unittest.main()
