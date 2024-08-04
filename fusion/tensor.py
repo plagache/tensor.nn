@@ -5,11 +5,8 @@ from typing import Optional, Tuple, Type, Union
 import numpy as np
 from numpy import dtype
 
-# from fusion.shape import shape_extractor
 
 default_type = np.float32
-default_float = np.float32
-default_int = np.int32
 
 ftype = Union[int, float, list, np.integer, np.floating, np.ndarray]
 
@@ -30,6 +27,7 @@ class Function:
     @classmethod
     def apply(cls: Type[Function], *parent: Tensor):
         context = cls(*parent)
+        # do i need parent or only the numpy array to create output ?
         output = Tensor(context.forward(*parent))
         output._context = context
         return output
@@ -40,7 +38,6 @@ class Sum(Function):
         return np.sum(x.ndata)
 
     def backward(self, output: Tensor):
-        # this line unpack the tuple of (*self.parents)
         (x,) = self.parents
         return np.ones(x.shape) * output.ndata
         # return np.ones_like(x.ndata) * output.ndata
@@ -140,15 +137,8 @@ class Exp(Function):
 
 
 class Tensor:
-    # https://wiki.python.org/moin/UsingSlots
-    # slots are more efficient in terms of memory space and speed of access, and a bit safer than the default Python method of data access
-    # __slots__ = "ndata", "need_gradient", "gradient", "_context"
-
     # how to handle various type for ndata ?
-    def __init__(self, data: ftype, requires_gradient: Optional[bool] = None):
-        # True for parameters training / False for inference / inputs / labels
-        self.requires_gradient: Optional[bool] = requires_gradient
-
+    def __init__(self, data: ftype):
         # for the zero_grad we set to None the value of gradients and we can use the None to do operation like
         # we create a copy in shape of the tensor and zeroed all the value
         self.gradient: Optional[Tensor] = None
@@ -220,12 +210,7 @@ class Tensor:
                 gradients = [Tensor(g, requires_gradient=False) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                 # if a Tensor is used multiple time in our graph, we add gradient
-                # print(type(gradient))
-                # print(gradient)
-                # print(type(parent.gradient))
-                # print(parent.gradient)
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
-                # parent.gradient = gradient
             del node._context
         return self
 
@@ -282,6 +267,9 @@ class Tensor:
     def exp(self):
         return Exp.apply(self)
 
+    def logistic(self):
+        return Tensor(1) / (Tensor(1) + -(self).exp())
+
     # def sigmoid(self):
     #     return self.
     #     return Sigmoid.apply(self)
@@ -303,6 +291,8 @@ class Tensor:
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
         if self.gradient is not None:
-            return f"<Tensor(ndata={self.ndata}, gradient={self.gradient.ndata} ,requires_gradient={self.requires_gradient})>"
+            # return f"<Tensor(ndata={self.ndata}, gradient={self.gradient.ndata} ,requires_gradient={self.requires_gradient})>"
+            return f"<Tensor(shape={self.shape}, gradient is not None, requires_gradient={self.requires_gradient})>"
         else:
-            return f"<Tensor(ndata={self.ndata}, requires_gradient={self.requires_gradient})>"
+            # return f"<Tensor(ndata={self.ndata}, requires_gradient={self.requires_gradient})>"
+            return f"<Tensor(shape={self.shape}, gradient is NONE, requires_gradient={self.requires_gradient})>"
