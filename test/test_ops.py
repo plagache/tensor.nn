@@ -1,9 +1,7 @@
-from typing import Optional
 import unittest
 import numpy as np
 from fusion import Tensor
 from tinygrad.tensor import Tensor as Tiny_Tensor
-# from tinygrad.dtype import dtypes
 
 
 def test_compare_tinygrad(self, x_np, y_np, precision=None):

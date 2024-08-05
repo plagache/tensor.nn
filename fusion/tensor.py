@@ -98,16 +98,13 @@ class Log(Function):
         return (1 / x.ndata) * output.ndata
 
 
-class Pow(Function):
-    def forward(self, x: Tensor, power):
-        # print(type(power))
-        # print(type(x.ndata))
-        # return x.ndata ** power
-        return np.power(x.ndata, power)
-
-    def backward(self, output: Tensor):
-        x, power = self.parents
-        return (power * np.power(x.ndata, (power - 1))) * output.ndata
+# class Pow(Function):
+#     def forward(self, x: Tensor, power):
+#         return np.power(x.ndata, power)
+#
+#     def backward(self, output: Tensor):
+#         x, power = self.parents
+#         return (power * np.power(x.ndata, (power - 1))) * output.ndata
 
 
 class Exp(Function):
@@ -184,7 +181,6 @@ class Tensor:
                     node_visited.add(node)
                     for parent in node._context.parents:
                         _topological_sort(parent, node_visited, graph_sorted)
-                        # yield / is for lazy, thus yielding the data
                     graph_sorted.append(node)
             return graph_sorted
 
@@ -192,24 +188,25 @@ class Tensor:
 
     def backward(self):
         # First gradient is always one
-        self.gradient = Tensor(np.ones(self.shape), requires_gradient=False)
+        self.gradient = Tensor(np.ones(self.shape))
         # if self.shape == ():
         #     self.gradient = Tensor(1, requires_gradient=False)
         # else:
         #     print(f"backward can only be perform on scalar value and shape is: {self.shape}")
         #     return
 
-        # self.gradient = Tensor(np.ones_like(self.ndata), requires_gradient=False)
+        # self.gradient = Tensor(np.ones_like(self.ndata))
 
         for node in reversed(self.topological_sort()):
             gradients = node._context.backward(node.gradient)
             # we compute gradient // one for each parents
             if len(node._context.parents) == 1:
-                gradients = [Tensor(gradients, requires_gradient=False)]
+                gradients = [Tensor(gradients)]
             else:
-                gradients = [Tensor(g, requires_gradient=False) for g in gradients]
+                gradients = [Tensor(g) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                 # if a Tensor is used multiple time in our graph, we add gradient
+                print(type(parent))
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
             del node._context
         return self
@@ -254,11 +251,11 @@ class Tensor:
     def log(self):
         return Log.apply(self)
 
-    def pow(self, power):
-        return Pow.apply(self, power)
-
-    def __pow__(self, power):
-        return self.pow(power)
+    # def pow(self, power):
+    #     return Pow.apply(self, power)
+    #
+    # def __pow__(self, power):
+    #     return self.pow(power)
 
     def mean(self):
         one_div = Tensor(np.array([1 / self.ndata.size]))
@@ -291,8 +288,6 @@ class Tensor:
         # return f'<Tensor(shape={self.ndata.shape})>'
         # we do not store operation on the Tensor: its in Function
         if self.gradient is not None:
-            # return f"<Tensor(ndata={self.ndata}, gradient={self.gradient.ndata} ,requires_gradient={self.requires_gradient})>"
-            return f"<Tensor(shape={self.shape}, gradient is not None, requires_gradient={self.requires_gradient})>"
+            return f"<Tensor(shape={self.shape}, gradient is not None)>"
         else:
-            # return f"<Tensor(ndata={self.ndata}, requires_gradient={self.requires_gradient})>"
-            return f"<Tensor(shape={self.shape}, gradient is NONE, requires_gradient={self.requires_gradient})>"
+            return f"<Tensor(shape={self.shape}, gradient is NONE)>"
