@@ -5,6 +5,7 @@ import polars.selectors as cs
 from fusion import Tensor
 import numpy as np
 
+# .venv/bin/python3.11 examples/mlp_train.py datasets/mlp.csv
 
 hidden_layer = 10
 output_layer = 2
@@ -65,13 +66,13 @@ if __name__ == "__main__":
     backward = sum.backward()
     # backward = output.backward()
     # output = model.forward(xs.T).logsoftmax()
-    print(output.ndata)
-    print(sum.ndata)
-    print(model.input_layer)
-    print(model.input_layer.gradient)
-    print(type(model.input_layer.gradient))
-    print(model.hidden_layer_1.gradient)
-    print(model.output_layer.gradient)
+    # print(output.ndata)
+    # print(sum.ndata)
+    # print(model.input_layer)
+    # print(model.input_layer.gradient)
+    # print(type(model.input_layer.gradient))
+    # print(model.hidden_layer_1.gradient)
+    # print(model.output_layer.gradient)
     # print(dataset)
     # print(dataset.describe())
     # print(numerical_dataset)

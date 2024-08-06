@@ -198,7 +198,7 @@ class Tensor:
 
         # self.gradient = Tensor(np.ones_like(self.ndata))
 
-        print(self.topological_sort())
+        # print(self.topological_sort())
         draw_graph(self, "graph")
 
         for node in reversed(self.topological_sort()):
@@ -210,7 +210,7 @@ class Tensor:
                 gradients = [Tensor(g) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                 # if a Tensor is used multiple time in our graph, we add gradient
-                print(type(parent))
+                # print(type(parent))
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
             del node._context
         return self
