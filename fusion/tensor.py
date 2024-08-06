@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import Optional, Tuple, Type, Union
 
 import numpy as np
-from numpy import dtype
 
+from fusion.graph import draw_graph
+from numpy import dtype
 
 default_type = np.float32
 
@@ -196,6 +197,9 @@ class Tensor:
         #     return
 
         # self.gradient = Tensor(np.ones_like(self.ndata))
+
+        print(self.topological_sort())
+        draw_graph(self, "graph")
 
         for node in reversed(self.topological_sort()):
             gradients = node._context.backward(node.gradient)

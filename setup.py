@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name="fusion",
     packages=["fusion"],
-    install_requires=["numpy"],
+    install_requires=["numpy", "graphviz"],
     extras_require={
         "testing": [
             "tinygrad==0.9.0",
