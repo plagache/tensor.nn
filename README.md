@@ -32,6 +32,7 @@ if you want hardware optimization and lazyness you should use [tinygrad](https:/
 - [ ] Tensor class / Automatic differentiation
     - [x] Simple derivatives with context (what created the next value / parent / operation)
     - [x] Backpropagation with topological sort based on Chain of rules
+    - [ ] require_gradient parameters
 - [ ] Optimizer
     - [ ] GD
     - [ ] SGD

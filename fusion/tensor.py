@@ -214,7 +214,7 @@ class Tensor:
                 # if a Tensor is used multiple time in our graph, we add gradient
                 # print(type(parent))
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
-            del node._context
+            # del node._context
         return self
 
     def sum(self):
@@ -290,10 +290,7 @@ class Tensor:
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def __repr__(self) -> str:
-        # assert self.ndata.shape is not None
-        # return f'<Tensor(shape={self.ndata.shape})>'
-        # we do not store operation on the Tensor: its in Function
-        if self.gradient is not None:
-            return f"<Tensor(shape={self.shape}, gradient is not None)>"
+        if self._context is not None:
+            return f"<Tensor <{self.shape} {self.dtype}, {self._context.__class__.__name__}> with gradient {self.gradient}>"
         else:
-            return f"<Tensor(shape={self.shape}, gradient is NONE)>"
+            return f"<Tensor <{self.shape} {self.dtype}> with gradient {self.gradient}>"
