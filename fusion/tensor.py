@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 
 from typing import Optional, Tuple, Type, Union
 
@@ -199,7 +200,8 @@ class Tensor:
         # self.gradient = Tensor(np.ones_like(self.ndata))
 
         # print(self.topological_sort())
-        draw_graph(self, "graph")
+        if os.getenv("GRAPH") == "1":
+            draw_graph(self, "graph")
 
         for node in reversed(self.topological_sort()):
             gradients = node._context.backward(node.gradient)

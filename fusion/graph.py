@@ -24,7 +24,7 @@ def draw_graph(root, filename, format="svg", rankdir="LR"):
     dot = Digraph(filename=filename, format=format, graph_attr={"rankdir": rankdir})  # , node_attr={'rankdir': 'TB'})
 
     for node in reversed(nodes):
-            dot.node(node.__repr__())
+        dot.node(node.__repr__())
 
     for node in reversed(nodes):
         for parent in node._context.parents:
@@ -34,6 +34,7 @@ def draw_graph(root, filename, format="svg", rankdir="LR"):
     print(dot.source)
 
     ## this will save and render the graph
-    dot.render(directory="/tmp", view=True)
+    # dot.render(directory="/tmp", view=True)
+    dot.render(directory="/tmp", view=False)
 
     return dot

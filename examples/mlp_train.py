@@ -6,6 +6,7 @@ from fusion import Tensor
 import numpy as np
 
 # .venv/bin/python3.11 examples/mlp_train.py datasets/mlp.csv
+# GRAPH=1 .venv/bin/python3.11 examples/mlp_train.py datasets/mlp.csv
 
 hidden_layer = 10
 output_layer = 2
