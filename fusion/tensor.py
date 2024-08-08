@@ -290,7 +290,7 @@ class Tensor:
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def __repr__(self) -> str:
-        if self._context is not None:
+        if hasattr(self, "_context"):
             return f"<Tensor <{self.shape} {self.dtype}, {self._context.__class__.__name__}> with gradient {self.gradient}>"
         else:
             return f"<Tensor <{self.shape} {self.dtype}> with gradient {self.gradient}>"
