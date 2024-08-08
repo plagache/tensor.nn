@@ -214,7 +214,7 @@ class Tensor:
                 # if a Tensor is used multiple time in our graph, we add gradient
                 # print(type(parent))
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
-            # del node._context
+            del node._context
         return self
 
     def sum(self):
