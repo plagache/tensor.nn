@@ -14,8 +14,8 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
     - [x] Relu
     - [x] div
     - [x] exp
-    - [x] pow
-        - how do we not compute gradient for parent that is the power ?
+    - [ ] pow
+        - [ ] * itself ^N times
 
 ## To-do
 
