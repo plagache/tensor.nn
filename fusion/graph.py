@@ -20,12 +20,12 @@ def topological_sort(self):
     return _topological_sort(self, set(), [])
 
 
-def draw_graph(root, filename, format="svg", rankdir="TB"):
+def draw_graph(root, filename, format="svg", rankdir="LR"):
     """
     format: png | svg | ...
     rankdir: TB (top to bottom graph) | LR (left to right)
     """
-    assert rankdir in ["TB", "LR"]
+    assert rankdir in ["LR", "BT"]
     nodes = topological_sort(root)
     dot = Digraph(filename=filename, format=format, graph_attr={"rankdir": rankdir})  # , node_attr={'rankdir': 'TB'})
 
