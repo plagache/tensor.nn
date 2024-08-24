@@ -61,7 +61,7 @@ run:
 
 
 ### Test
-test_module: setup.py
+test_module: setup setup.py
 	${PIP} install -e '.[testing]' --upgrade
 
 test:

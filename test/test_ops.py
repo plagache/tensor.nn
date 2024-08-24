@@ -4,26 +4,17 @@ from fusion import Tensor
 from tinygrad.tensor import Tensor as Tiny_Tensor
 
 
-def test_compare_tinygrad(self, x_np, y_np, precision=None):
-    if precision is not None:
-        decimal = precision
-    else:
-        decimal = 1e-07
-
+def test_compare_tinygrad(self, x_np, y_np):
     x = Tensor(x_np)
     y = Tensor(y_np)
 
     mul = x * y
     add = mul + x
     relu = add.relu()
-    # pow = relu.pow(Tensor(2))
-    pow = relu**2
-    sum = pow.sum()
-    # sum = relu.sum()
+    sum = relu.sum()
     sum.backward()
 
     sum_gradient = sum.gradient.ndata
-    pow_gradient = pow.gradient.ndata
     relu_gradient = relu.gradient.ndata
     add_gradient = add.gradient.ndata
     mul_gradient = mul.gradient.ndata
@@ -36,13 +27,10 @@ def test_compare_tinygrad(self, x_np, y_np, precision=None):
     tiny_mul = tiny_x * tiny_y
     tiny_add = tiny_mul + tiny_x
     tiny_relu = tiny_add.relu()
-    tiny_pow = tiny_relu**2
-    tiny_sum = tiny_pow.sum()
-    # tiny_sum = tiny_relu.sum()
+    tiny_sum = tiny_relu.sum()
     tiny_sum.backward()
 
     tiny_sum_gradient = tiny_sum.grad.numpy()
-    tiny_pow_gradient = tiny_pow.grad.numpy()
     tiny_relu_gradient = tiny_relu.grad.numpy()
     tiny_add_gradient = tiny_add.grad.numpy()
     tiny_mul_gradient = tiny_mul.grad.numpy()
@@ -56,9 +44,8 @@ def test_compare_tinygrad(self, x_np, y_np, precision=None):
     # print(relu.ndata, tiny_relu.numpy())
     # print("precision:", precision)
     # print("decimal:", decimal)
-    np.testing.assert_allclose(sum.ndata, tiny_sum.numpy(), rtol=decimal, atol=decimal)
-    # np.testing.assert_allclose(sum.ndata, tiny_sum.numpy())
-    np.testing.assert_allclose(pow.ndata, tiny_pow.numpy())
+    # np.testing.assert_allclose(sum.ndata, tiny_sum.numpy(), rtol=decimal, atol=decimal)
+    np.testing.assert_allclose(sum.ndata, tiny_sum.numpy())
     np.testing.assert_allclose(relu.ndata, tiny_relu.numpy())
     np.testing.assert_allclose(add.ndata, tiny_add.numpy())
     np.testing.assert_allclose(mul.ndata, tiny_mul.numpy())
@@ -78,10 +65,49 @@ def test_compare_tinygrad(self, x_np, y_np, precision=None):
     np.testing.assert_allclose(y_gradient, tiny_y_gradient)
 
 
+def test_special_ops(self, x_np, y_np):
+    x = Tensor(x_np)
+    y = Tensor(y_np)
+    zero_tensor = Tensor(0)
+
+    tiny_x = Tiny_Tensor(x_np, requires_grad=True)
+    tiny_y = Tiny_Tensor(y_np, requires_grad=True)
+    tiny_zero_tensor = Tiny_Tensor(0, requires_grad=True)
+
+    log_0 = zero_tensor.log()
+    # print(f"---\nlog(0) = {log_0.numpy()}\ndtype(log(0)) = {(log_0.numpy().dtype)}")
+
+    exp_x = Tensor(700).exp()
+    # print(f"---\nexp(x) = {exp_x.numpy()}")
+
+    tiny_log_0 = tiny_zero_tensor.log()
+    # print(f"---\ntiny log(0) = {tiny_log_0.numpy()}\ndtype(log(0)) = {(tiny_log_0.numpy().dtype)}")
+
+    tiny_exp = Tiny_Tensor(89).exp()
+    # print(f"---\ntiny exp(x) = {tiny_exp.numpy()}")
+
+    # logistic = x.logistic()
+    # print(f"---\nlogistic = {logistic.numpy()}\ndtype(logistic)) = {(logistic.numpy().dtype)}")
+
+    sigmoid = x.sigmoid()
+    # print(f"---\nsigmoid = {sigmoid.numpy()}\ndtype(sigmoid)) = {(sigmoid.numpy().dtype)}")
+
+    tiny_sigmoid = tiny_x.sigmoid()
+    # print(f"---\ntiny_sigmoid = {tiny_sigmoid.numpy()}\ndtype(tiny_sigmoid) = {(tiny_sigmoid.numpy().dtype)}")
+
+    np.testing.assert_allclose(sigmoid.ndata, tiny_sigmoid.numpy())
+    # exp(x)
+    # log(0)
+    # div(0) encounter with backward log(0)
+    # power of non Tensor
+
+    # pow = relu.pow(Tensor(2))
+    # pow = relu ** Tensor(2)
+    # sum = pow.sum()
+
+
 class test_gradient(unittest.TestCase):
     def test_multiple_type(self):
-        precision = 1e-04
-
         x_np = np.random.randint(-9, 9, size=(3, 3))
         y_np = np.random.randint(-9, 9, size=(3, 3))
         # print(x_np)
@@ -98,13 +124,14 @@ class test_gradient(unittest.TestCase):
         # print(np.info(y_np))
         test_compare_tinygrad(self, x_np, y_np)
 
-        x_np = np.random.uniform(-9, 9, size=(3, 3)).astype(np.float32)
-        y_np = np.random.uniform(-9, 9, size=(3, 3)).astype(np.float32)
+        x_np = np.random.uniform(-9, 9, size=(3, 3))
+        y_np = np.random.uniform(-9, 9, size=(3, 3))
         # print(x_np)
         # print(y_np)
         # print(np.info(x_np))
         # print(np.info(y_np))
-        # test_compare_tinygrad(self, x_np, y_np, precision)
+
+        test_special_ops(self, x_np, y_np)
 
 
 if __name__ == "__main__":

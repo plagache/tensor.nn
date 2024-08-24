@@ -8,9 +8,7 @@ import numpy as np
 from fusion.graph import draw_graph
 from numpy import dtype
 
-default_type = np.float32
-
-ftype = Union[int, float, list, np.integer, np.floating, np.ndarray]
+ftype = Union[int, float, list, np.int64, np.float64, np.ndarray]
 
 
 class Function:
@@ -147,13 +145,13 @@ class Tensor:
         self._context: Optional[Function] = None
 
         if not isinstance(data, ftype):
-            raise RuntimeError(f"data of type :{type(data)} is not supported")
+            raise RuntimeError(f"type: {type(data)} is not supported")
 
-        if isinstance(data, (int, float, list, np.integer, np.floating)):
+        if isinstance(data, (int, float, list, np.int64, np.float64)):
             if isinstance(data, int):
-                self.ndata = np.array(data, dtype=np.integer)
+                self.ndata = np.array(data, dtype=np.int64)
             if isinstance(data, float):
-                self.ndata = np.array(data, dtype=default_type)
+                self.ndata = np.array(data, dtype=np.float64)
             else:
                 self.ndata = np.array(data)
             return
@@ -177,7 +175,9 @@ class Tensor:
 
     # def dtype(self) -> dtype: return np.dtype(self.ndata)
 
-    # def numpy(self) -> np.ndarray: return self.ndata
+    def numpy(self) -> np.ndarray:
+        return self.ndata
+
     # def numpy(self) -> np.ndarray: return self.lazydata.numpy()
 
     def topological_sort(self):
@@ -231,7 +231,7 @@ class Tensor:
         return self.add(other)
 
     def __neg__(self):
-        return self.mul(-1)
+        return self.mul(Tensor(-1))
 
     def sub(self, other):
         return self.add(-other)
@@ -276,6 +276,9 @@ class Tensor:
 
     def logistic(self):
         return Tensor(1) / (Tensor(1) + -(self).exp())
+
+    def sigmoid(self):
+        return self.exp() / (Tensor(1) + (self).exp())
 
     # def sigmoid(self):
     #     return self.
