@@ -116,6 +116,17 @@ class Exp(Function):
         return np.exp(x.ndata) * output.ndata
 
 
+class Sigmoid(Function):
+    def forward(self, x: Tensor):
+        return 1 / (1 + np.exp(-x.ndata))
+        return np.exp(x.ndata) / (1 + np.exp(x.ndata))
+
+    def backward(self, output: Tensor):
+        (x,) = self.parents
+        σ = np.exp(x.ndata) / (1 + np.exp(x.ndata))
+        return σ * (1 - σ) * output.ndata
+
+
 # Movement ops, modify size of Tensor
 # class Expand(Function):
 #     def forward(self, x: Tensor, output_shape: Tuple):
@@ -269,11 +280,11 @@ class Tensor:
     def exp(self):
         return Exp.apply(self)
 
-    def logistic(self):
-        return Tensor(1) / (Tensor(1) + -(self).exp())
-
     def sigmoid(self):
-        return self.exp() / (Tensor(1) + (self).exp())
+        return Sigmoid.apply(self)
+
+    # def logistic(self):
+    #     return Tensor(1) / (Tensor(1) + -(self).exp())
 
     # def expand(self, shape):
     #     return Expand.apply(self, shape)

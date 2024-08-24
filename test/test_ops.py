@@ -113,14 +113,14 @@ def test_sigmoid(self, x_np, y_np):
     sigmoid = x.sigmoid()
     sigmoid.sum().backward()
     x_grad = x.gradient.ndata
-    print(f"---\nsigmoid = {sigmoid.numpy()}\ndtype(sigmoid)) = {(sigmoid.numpy().dtype)}")
-    print(f"---\nx_grad = {x_grad}\ndtype(x_grad)) = {x_grad.dtype}")
+    # print(f"---\nsigmoid = {sigmoid.numpy()}\ndtype(sigmoid)) = {(sigmoid.numpy().dtype)}")
+    # print(f"---\nx_grad = {x_grad}\ndtype(x_grad)) = {x_grad.dtype}")
 
     tiny_sigmoid = tiny_x.sigmoid()
     tiny_sigmoid.sum().backward()
     tiny_x_grad = tiny_x.grad.numpy()
-    print(f"---\ntiny_sigmoid = {tiny_sigmoid.numpy()}\ndtype(tiny_sigmoid) = {(tiny_sigmoid.numpy().dtype)}")
-    print(f"---\ntiny_x_grad = {tiny_x_grad}\ndtype(tiny_x_grad)) = {tiny_x_grad.dtype}")
+    # print(f"---\ntiny_sigmoid = {tiny_sigmoid.numpy()}\ndtype(tiny_sigmoid) = {(tiny_sigmoid.numpy().dtype)}")
+    # print(f"---\ntiny_x_grad = {tiny_x_grad}\ndtype(tiny_x_grad)) = {tiny_x_grad.dtype}")
 
     np.testing.assert_allclose(sigmoid.ndata, tiny_sigmoid.numpy())
     np.testing.assert_allclose(x_grad, tiny_x_grad)
@@ -155,6 +155,7 @@ class test_gradient(unittest.TestCase):
         # x_np = np.random.uniform(-9, 9, size=(3, 3))
         # y_np = np.random.uniform(-9, 9, size=(3, 3))
         # test_pow(self, x_np, y_np)
+
 
 if __name__ == "__main__":
     unittest.main()
