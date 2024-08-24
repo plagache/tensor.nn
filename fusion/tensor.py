@@ -116,11 +116,6 @@ class Exp(Function):
         return np.exp(x.ndata) * output.ndata
 
 
-# class Sigmoid(Function):
-#     def forward(self, x: Tensor):
-#         return 1 / (1 + np.exp(x.ndata * -1))
-
-
 # Movement ops, modify size of Tensor
 # class Expand(Function):
 #     def forward(self, x: Tensor, output_shape: Tuple):
@@ -279,10 +274,6 @@ class Tensor:
 
     def sigmoid(self):
         return self.exp() / (Tensor(1) + (self).exp())
-
-    # def sigmoid(self):
-    #     return self.
-    #     return Sigmoid.apply(self)
 
     # def expand(self, shape):
     #     return Expand.apply(self, shape)

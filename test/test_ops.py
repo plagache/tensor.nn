@@ -65,55 +65,65 @@ def test_compare_tinygrad(self, x_np, y_np):
     np.testing.assert_allclose(y_gradient, tiny_y_gradient)
 
 
-def test_special_ops(self, x_np, y_np):
+def test_logarithm(self, x_np, y_np):
     x = Tensor(x_np)
     y = Tensor(y_np)
-    zero_tensor = Tensor(0)
 
     tiny_x = Tiny_Tensor(x_np, requires_grad=True)
     tiny_y = Tiny_Tensor(y_np, requires_grad=True)
-    tiny_zero_tensor = Tiny_Tensor(0, requires_grad=True)
 
-    log_0 = zero_tensor.log()
-    # print(f"---\nlog(0) = {log_0.numpy()}\ndtype(log(0)) = {(log_0.numpy().dtype)}")
+    logarithm = x.log()
+    logarithm.sum().backward()
+    x_grad = x.gradient.ndata
 
-    exp_x = Tensor(700).exp()
-    # print(f"---\nexp(x) = {exp_x.numpy()}")
+    tiny_logarithm = tiny_x.log()
+    tiny_logarithm.sum().backward()
+    tiny_x_grad = tiny_x.grad.numpy()
 
-    tiny_log_0 = tiny_zero_tensor.log()
-    # print(f"---\ntiny log(0) = {tiny_log_0.numpy()}\ndtype(log(0)) = {(tiny_log_0.numpy().dtype)}")
+    np.testing.assert_allclose(logarithm.ndata, tiny_logarithm.numpy())
+    np.testing.assert_allclose(x_grad, tiny_x_grad)
 
-    tiny_exp = Tiny_Tensor(89).exp()
-    # print(f"---\ntiny exp(x) = {tiny_exp.numpy()}")
 
-    # logistic = x.logistic()
-    # print(f"---\nlogistic = {logistic.numpy()}\ndtype(logistic)) = {(logistic.numpy().dtype)}")
+def test_exponantial(self, x_np, y_np):
+    x = Tensor(x_np)
+    y = Tensor(y_np)
+
+    tiny_x = Tiny_Tensor(x_np, requires_grad=True)
+    tiny_y = Tiny_Tensor(y_np, requires_grad=True)
+
+    exponantial = x.exp()
+    exponantial.sum().backward()
+    x_grad = x.gradient.ndata
+
+    tiny_exponantial = tiny_x.exp()
+    tiny_exponantial.sum().backward()
+    tiny_x_grad = tiny_x.grad.numpy()
+
+    np.testing.assert_allclose(exponantial.ndata, tiny_exponantial.numpy())
+    np.testing.assert_allclose(x_grad, tiny_x_grad)
+
+
+def test_sigmoid(self, x_np, y_np):
+    x = Tensor(x_np)
+    y = Tensor(y_np)
+
+    tiny_x = Tiny_Tensor(x_np, requires_grad=True)
+    tiny_y = Tiny_Tensor(y_np, requires_grad=True)
 
     sigmoid = x.sigmoid()
     sigmoid.sum().backward()
     x_grad = x.gradient.ndata
-    # print(f"---\nsigmoid = {sigmoid.numpy()}\ndtype(sigmoid)) = {(sigmoid.numpy().dtype)}")
+    print(f"---\nsigmoid = {sigmoid.numpy()}\ndtype(sigmoid)) = {(sigmoid.numpy().dtype)}")
     print(f"---\nx_grad = {x_grad}\ndtype(x_grad)) = {x_grad.dtype}")
 
     tiny_sigmoid = tiny_x.sigmoid()
     tiny_sigmoid.sum().backward()
     tiny_x_grad = tiny_x.grad.numpy()
-    # print(f"---\ntiny_sigmoid = {tiny_sigmoid.numpy()}\ndtype(tiny_sigmoid) = {(tiny_sigmoid.numpy().dtype)}")
+    print(f"---\ntiny_sigmoid = {tiny_sigmoid.numpy()}\ndtype(tiny_sigmoid) = {(tiny_sigmoid.numpy().dtype)}")
     print(f"---\ntiny_x_grad = {tiny_x_grad}\ndtype(tiny_x_grad)) = {tiny_x_grad.dtype}")
 
     np.testing.assert_allclose(sigmoid.ndata, tiny_sigmoid.numpy())
     np.testing.assert_allclose(x_grad, tiny_x_grad)
-
-    # I should investigate the exponantial backward / derivatives
-
-    # exp(x)
-    # log(0)
-    # div(0) encounter with backward log(0)
-    # power of non Tensor
-
-    # pow = relu.pow(Tensor(2))
-    # pow = relu ** Tensor(2)
-    # sum = pow.sum()
 
 
 class test_gradient(unittest.TestCase):
@@ -128,21 +138,23 @@ class test_gradient(unittest.TestCase):
 
         x_np = np.random.uniform(-9, 9, size=(3, 3))
         y_np = np.random.uniform(-9, 9, size=(3, 3))
-        # print(x_np)
-        # print(y_np)
-        # print(np.info(x_np))
-        # print(np.info(y_np))
         test_compare_tinygrad(self, x_np, y_np)
+
+        x_np = np.random.uniform(0, 9, size=(3, 3))
+        y_np = np.random.uniform(0, 9, size=(3, 3))
+        test_logarithm(self, x_np, y_np)
+
+        x_np = np.random.uniform(-89, 89, size=(3, 3))
+        y_np = np.random.uniform(-89, 89, size=(3, 3))
+        test_exponantial(self, x_np, y_np)
 
         x_np = np.random.uniform(-9, 9, size=(3, 3))
         y_np = np.random.uniform(-9, 9, size=(3, 3))
-        # print(x_np)
-        # print(y_np)
-        # print(np.info(x_np))
-        # print(np.info(y_np))
+        test_sigmoid(self, x_np, y_np)
 
-        test_special_ops(self, x_np, y_np)
-
+        # x_np = np.random.uniform(-9, 9, size=(3, 3))
+        # y_np = np.random.uniform(-9, 9, size=(3, 3))
+        # test_pow(self, x_np, y_np)
 
 if __name__ == "__main__":
     unittest.main()
