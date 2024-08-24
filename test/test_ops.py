@@ -125,6 +125,28 @@ def test_sigmoid(self, x_np, y_np):
     np.testing.assert_allclose(sigmoid.ndata, tiny_sigmoid.numpy())
     np.testing.assert_allclose(x_grad, tiny_x_grad)
 
+def test_pow(self, x_np, y_np):
+    x = Tensor(x_np)
+    y = Tensor(y_np)
+
+    tiny_x = Tiny_Tensor(x_np, requires_grad=True)
+    tiny_y = Tiny_Tensor(y_np, requires_grad=True)
+
+    power = x ** Tensor(2)
+    # power = x.pow(2)
+    power.sum().backward()
+    x_grad = x.gradient.ndata
+    print(f"---\npower = {power.numpy()}\ndtype(power)) = {(power.numpy().dtype)}")
+    # print(f"---\nx_grad = {x_grad}\ndtype(x_grad)) = {x_grad.dtype}")
+
+    tiny_power = tiny_x ** 2
+    tiny_power.sum().backward()
+    tiny_x_grad = tiny_x.grad.numpy()
+    print(f"---\ntiny_power = {tiny_power.numpy()}\ndtype(tiny_power) = {(tiny_power.numpy().dtype)}")
+    # print(f"---\ntiny_x_grad = {tiny_x_grad}\ndtype(tiny_x_grad)) = {tiny_x_grad.dtype}")
+
+    np.testing.assert_allclose(power.ndata, tiny_power.numpy())
+    np.testing.assert_allclose(x_grad, tiny_x_grad)
 
 class test_gradient(unittest.TestCase):
     def test_multiple_type(self):
@@ -152,9 +174,9 @@ class test_gradient(unittest.TestCase):
         y_np = np.random.uniform(-9, 9, size=(3, 3))
         test_sigmoid(self, x_np, y_np)
 
-        # x_np = np.random.uniform(-9, 9, size=(3, 3))
-        # y_np = np.random.uniform(-9, 9, size=(3, 3))
-        # test_pow(self, x_np, y_np)
+        x_np = np.random.uniform(-9, 9, size=(3, 3))
+        y_np = np.random.uniform(-9, 9, size=(3, 3))
+        test_pow(self, x_np, y_np)
 
 
 if __name__ == "__main__":

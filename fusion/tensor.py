@@ -98,13 +98,13 @@ class Log(Function):
         return (1 / x.ndata) * output.ndata
 
 
-# class Pow(Function):
-#     def forward(self, x: Tensor, power):
-#         return np.power(x.ndata, power)
-#
-#     def backward(self, output: Tensor):
-#         x, power = self.parents
-#         return (power * np.power(x.ndata, (power - 1))) * output.ndata
+class Pow(Function):
+    def forward(self, x: Tensor, power: Tensor):
+        return np.power(x.ndata, power)
+
+    def backward(self, output: Tensor):
+        x, power = self.parents
+        return (power * np.power(x.ndata, (power - 1))) * output.ndata
 
 
 class Exp(Function):
@@ -118,12 +118,15 @@ class Exp(Function):
 
 class Sigmoid(Function):
     def forward(self, x: Tensor):
+        σ = 1 / (1 + np.exp(-x.ndata))
+        return σ
         return 1 / (1 + np.exp(-x.ndata))
         return np.exp(x.ndata) / (1 + np.exp(x.ndata))
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        σ = np.exp(x.ndata) / (1 + np.exp(x.ndata))
+        # σ = np.exp(x.ndata) / (1 + np.exp(x.ndata))
+        σ = 1 / (1 + np.exp(-x.ndata))
         return σ * (1 - σ) * output.ndata
 
 
@@ -222,7 +225,9 @@ class Tensor:
                 gradients = [Tensor(g) for g in gradients]
             for parent, gradient in zip(node._context.parents, gradients):
                 # if a Tensor is used multiple time in our graph, we add gradient
+                # print(parent)
                 # print(type(parent))
+                # print(parent.ndata)
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
             del node._context
         return self
@@ -267,11 +272,17 @@ class Tensor:
     def log(self):
         return Log.apply(self)
 
-    # def pow(self, power):
-    #     return Pow.apply(self, power)
-    #
-    # def __pow__(self, power):
-    #     return self.pow(power)
+    def pow(self, power):
+        print(isinstance(power, Tensor))
+        if not isinstance(power, Tensor):
+            power = Tensor(power)
+        return Pow.apply(self, power)
+
+    def __pow__(self, power):
+        print(isinstance(power, Tensor))
+        if not isinstance(power, Tensor):
+            power = Tensor(power)
+        return self.pow(power)
 
     def mean(self):
         one_div = Tensor(np.array([1 / self.ndata.size]))
