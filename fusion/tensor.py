@@ -8,8 +8,6 @@ import numpy as np
 from fusion.graph import draw_graph
 from numpy import dtype
 
-ftype = Union[int, float, list, np.int64, np.float64, np.ndarray]
-
 
 class Function:
     def __init__(self, *tensors: Tensor):
@@ -35,40 +33,40 @@ class Function:
 
 class Sum(Function):
     def forward(self, x: Tensor):
-        return np.sum(x.ndata)
+        return np.sum(x.data)
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        return np.ones(x.shape) * output.ndata
-        # return np.ones_like(x.ndata) * output.ndata
+        return np.ones(x.shape) * output.data
+        # return np.ones_like(x.data) * output.data
 
 
 class Relu(Function):
     def forward(self, x: Tensor):
-        return np.maximum(x.ndata, 0)
+        return np.maximum(x.data, 0)
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        output_gradient = np.copy(output.ndata)
-        output_gradient[x.ndata <= 0] = 0
+        output_gradient = np.copy(output.data)
+        output_gradient[x.data <= 0] = 0
         return output_gradient
 
 
 class Add(Function):
     def forward(self, x: Tensor, y: Tensor):
-        return np.add(x.ndata, y.ndata)
+        return np.add(x.data, y.data)
 
     def backward(self, output: Tensor):
-        return output.ndata, output.ndata
+        return output.data, output.data
 
 
 class Mul(Function):
     def forward(self, x: Tensor, y: Tensor):
-        return np.multiply(x.ndata, y.ndata)
+        return np.multiply(x.data, y.data)
 
     def backward(self, output: Tensor):
         x, y = self.parents
-        return y.ndata * output.ndata, x.ndata * output.ndata
+        return y.data * output.data, x.data * output.data
 
 
 class Dot(Function):
@@ -76,7 +74,7 @@ class Dot(Function):
         # x(A, B)
         # y(B, C)
         # output(A, C)
-        return np.dot(x.ndata, y.ndata)
+        return np.dot(x.data, y.data)
 
     def backward(self, output: Tensor):
         x, y = self.parents
@@ -86,48 +84,48 @@ class Dot(Function):
         # output.T :(C, A)
         # x :       (A, B)
         # result :  (C, B).T // we then transpose it to go in y_gradient
-        return np.dot(output.ndata, y.ndata.T), np.dot(output.ndata.T, x.ndata).T
+        return np.dot(output.data, y.data.T), np.dot(output.data.T, x.data).T
 
 
 class Log(Function):
     def forward(self, x: Tensor):
-        return np.log(x.ndata)
+        return np.log(x.data)
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        return (1 / x.ndata) * output.ndata
+        return (1 / x.data) * output.data
 
 
 class Pow(Function):
     def forward(self, x: Tensor, power: Tensor):
-        return np.power(x.ndata, power)
+        return np.power(x.data, power)
 
     def backward(self, output: Tensor):
         x, power = self.parents
-        return (power * np.power(x.ndata, (power - 1))) * output.ndata
+        return (power * np.power(x.data, (power - 1))) * output.data
 
 
 class Exp(Function):
     def forward(self, x: Tensor):
-        return np.exp(x.ndata)
+        return np.exp(x.data)
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        return np.exp(x.ndata) * output.ndata
+        return np.exp(x.data) * output.data
 
 
 class Sigmoid(Function):
     def forward(self, x: Tensor):
-        σ = 1 / (1 + np.exp(-x.ndata))
+        σ = 1 / (1 + np.exp(-x.data))
         return σ
-        return 1 / (1 + np.exp(-x.ndata))
-        return np.exp(x.ndata) / (1 + np.exp(x.ndata))
+        return 1 / (1 + np.exp(-x.data))
+        return np.exp(x.data) / (1 + np.exp(x.data))
 
     def backward(self, output: Tensor):
         (x,) = self.parents
-        # σ = np.exp(x.ndata) / (1 + np.exp(x.ndata))
-        σ = 1 / (1 + np.exp(-x.ndata))
-        return σ * (1 - σ) * output.ndata
+        # σ = np.exp(x.data) / (1 + np.exp(x.data))
+        σ = 1 / (1 + np.exp(-x.data))
+        return σ * (1 - σ) * output.data
 
 
 # Movement ops, modify size of Tensor
@@ -136,15 +134,16 @@ class Sigmoid(Function):
 #         self.input_shape = x.shape
 #         self.output_shape = output_shape
 #         self.diff = shape_extractor(self.input_shape, self.output_shape)
-#         return np.tile(x.ndata, (self.diff,1))
+#         return np.tile(x.data, (self.diff,1))
 #
 #     def backward(self, output: Tensor):
-#         return output.ndata
+#         return output.data
 
 
 class Tensor:
-    # how to handle various type for ndata ?
-    def __init__(self, data: ftype):
+    # how to handle various type for data ?
+    # i let numpy raise error
+    def __init__(self, data):
         # for the zero_grad we set to None the value of gradients and we can use the None to do operation like
         # we create a copy in shape of the tensor and zeroed all the value
         self.gradient: Optional[Tensor] = None
@@ -153,41 +152,26 @@ class Tensor:
         # _ mean private context
         self._context: Optional[Function] = None
 
-        if not isinstance(data, ftype):
-            raise RuntimeError(f"type: {type(data)} is not supported")
-
-        if isinstance(data, (int, float, list, np.int64, np.float64)):
-            if isinstance(data, int):
-                self.ndata = np.array(data, dtype=np.int64)
-            if isinstance(data, float):
-                self.ndata = np.array(data, dtype=np.float64)
-            else:
-                self.ndata = np.array(data)
-            return
-
         if isinstance(data, np.ndarray):
-            self.ndata = data
-            return
+            self.data = data
+        else:
+            self.data = np.array(data)
+
+        if not np.issubdtype(self.data.dtype, np.number):
+            raise TypeError(f"Invalid data type {self.data.dtype}. Numeric data required.")
 
     # @property is just a getter() | in our case it gets the shape()
     @property
     def shape(self) -> Tuple[int, ...]:
-        return self.ndata.shape
+        return self.data.shape
 
     @property
     def dtype(self) -> dtype:
-        return self.ndata.dtype
+        return self.data.dtype
 
     @property
     def tensor_attribute(self) -> str:
         return f"<{self.shape!r}, {self.dtype!r}>"
-
-    # def dtype(self) -> dtype: return np.dtype(self.ndata)
-
-    def numpy(self) -> np.ndarray:
-        return self.ndata
-
-    # def numpy(self) -> np.ndarray: return self.lazydata.numpy()
 
     def topological_sort(self):
         def _topological_sort(node, node_visited, graph_sorted):
@@ -210,7 +194,7 @@ class Tensor:
         #     print(f"backward can only be perform on scalar value and shape is: {self.shape}")
         #     return
 
-        # self.gradient = Tensor(np.ones_like(self.ndata))
+        # self.gradient = Tensor(np.ones_like(self.data))
 
         # print(self.topological_sort())
         if os.getenv("GRAPH") == "1":
@@ -227,7 +211,7 @@ class Tensor:
                 # if a Tensor is used multiple time in our graph, we add gradient
                 # print(parent)
                 # print(type(parent))
-                # print(parent.ndata)
+                # print(parent.data)
                 parent.gradient = gradient if parent.gradient is None else (parent.gradient + gradient)
             del node._context
         return self
@@ -263,7 +247,7 @@ class Tensor:
         return Dot.apply(self, other)
 
     def div(self, other):
-        one_div = Tensor(1 / other.ndata)
+        one_div = Tensor(1 / other.data)
         return self.mul(one_div)
 
     def __truediv__(self, other):
@@ -285,7 +269,7 @@ class Tensor:
         return self.pow(power)
 
     def mean(self):
-        one_div = Tensor(np.array([1 / self.ndata.size]))
+        one_div = Tensor(np.array([1 / self.data.size]))
         return self.sum().mul(one_div)
 
     def exp(self):
@@ -301,7 +285,7 @@ class Tensor:
     #     return Expand.apply(self, shape)
 
     def transpose(self):
-        self.ndata = self.ndata.T
+        self.data = self.data.T
         return self
 
     def __getattr__(self, name):

@@ -110,15 +110,15 @@ if __name__ == "__main__":
         loss.backward()
 
         # update parameters
-        # model.layer_1.ndata = model.layer_1.ndata - np.multiply(learning_rate.ndata, model.layer_1.gradient.ndata)
-        # model.layer_2.ndata = model.layer_2.ndata - np.multiply(learning_rate.ndata, model.layer_2.gradient.ndata)
-        model.layer_1.ndata = model.layer_1.ndata - (learning_rate.ndata * model.layer_1.gradient.ndata)
-        model.layer_2.ndata = model.layer_2.ndata - (learning_rate.ndata * model.layer_2.gradient.ndata)
+        # model.layer_1.data = model.layer_1.data - np.multiply(learning_rate.data, model.layer_1.gradient.data)
+        # model.layer_2.data = model.layer_2.data - np.multiply(learning_rate.data, model.layer_2.gradient.data)
+        model.layer_1.data = model.layer_1.data - (learning_rate.data * model.layer_1.gradient.data)
+        model.layer_2.data = model.layer_2.data - (learning_rate.data * model.layer_2.gradient.data)
 
         # Test accuracy
-        # print(output.ndata)
-        # print(np.info(output.ndata))
-        # prediction = np.maximum(output.ndata, axis=1)
+        # print(output.data)
+        # print(np.info(output.data))
+        # prediction = np.maximum(output.data, axis=1)
         # compare prediction and label to get accuracy
         # print(prediction)
         exit()

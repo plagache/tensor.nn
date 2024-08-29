@@ -4,11 +4,12 @@ Fusion of different machine learning tools
 
 ## Objectives
 Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a tensor class.
-A Tensor being a multidimensional array, in our case based on numpy ndarray.
+A Tensor containing a multidimensional array, in our case based on numpy ndarray.
 
 - Build small machine learning framework to complete the MLP project of 42
     - [x] dot
     - [ ] softmax
+    - [x] sigmoid
     - [x] log
 - Build and train a small neural network to detect handwritten digits
     - [x] Relu
@@ -20,12 +21,8 @@ A Tensor being a multidimensional array, in our case based on numpy ndarray.
 ## To-do
 
 I should try to reduce code to a minimum of features,
-if you want hardware optimization and lazyness you should use [tinygrad](https://github.com/tinygrad/tinygrad)
+if you want hardware optimization and lazyness we should use [tinygrad](https://github.com/tinygrad/tinygrad)
 
-- TEST specifique case
-    - [ ] exp(x) = inf WHERE x is big and positive
-    - [ ] log(0) = -inf
-    - [ ] 1/x WHERE x == 0
 
 - [ ] Sampler class, provide __iter__() methode, return length of batches
 
@@ -64,25 +61,6 @@ the base for this project to work are 2 class:
 - Tensor :
     - data : type[numpy array]
     - gradient : type[Tensor]
-    - \_context : type[Function]/ops, \*parents tensors
+    - \_context : type[Function]/ops, takes \*parents tensors as arguments
 
 we have made an example in [Functionnement](examples/simple_function.py)
-
-Lazyness :
-    - remove copy/tensor creation for each node in profit of memoryview()
-    - create a kernel that represent all the operations to compute the needed gradient / load for one pass
-
-### operations
-
-#### machine learning Ops to calculate derivatives
-
-```
-Relu, Log, Exp                                 # unary ops
-Sum, Max                                       # reduce ops (with axis argument)
-Maximum, Add, Sub, Mul, Pow, Div, Equal        # binary ops (no broadcasting, use expand)
-Expand, Reshape, Permute, Pad, Shrink, Flip    # movement ops
-```
-
-
-#### low level Ops
-these are cpu_features relative to the raw operations of your hardware
