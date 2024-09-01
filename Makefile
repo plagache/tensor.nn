@@ -7,14 +7,13 @@ PIP = ${BIN}/pip
 ACTIVATE = ${BIN}/activate
 
 EXAMPLES_DIR = examples/
-# EXAMPLE = simple_operation.py
-# EXAMPLE = simple_function.py
+EXAMPLE = tensor.py
 # EXAMPLE = mnist.py
-EXAMPLE = mlp_train.py
+# EXAMPLE = mlp_train.py
 PROGRAM = ${EXAMPLES_DIR}${EXAMPLE}
 
-DATASETS_DIR = datasets/
-DATASET = mlp.csv
+# DATASETS_DIR = datasets/
+# DATASET = mlp.csv
 ARGUMENTS = ${DATASETS_DIR}${DATASET}
 
 

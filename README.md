@@ -3,7 +3,7 @@ Fusion of different machine learning tools
 
 
 ## Objectives
-Create a machine learning framework based on the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/) with the addition of a tensor class.
+Understand machine learning framework and autograd with the [micrograd](https://github.com/karpathy/micrograd) of [Andrej Karpathy](https://karpathy.ai/), and then add the tensor class.
 A Tensor containing a multidimensional array, in our case based on numpy ndarray.
 
 - Build small machine learning framework to complete the MLP project of 42
@@ -20,11 +20,12 @@ A Tensor containing a multidimensional array, in our case based on numpy ndarray
 
 ## To-do
 
-I should try to reduce code to a minimum of features,
-if you want hardware optimization and lazyness we should use [tinygrad](https://github.com/tinygrad/tinygrad)
+I should try to reduce code to a minimum.
+I found the solution of [tinygrad](https://github.com/tinygrad/tinygrad) so elegant.
 
+"what i cannot create, i do not understand" - [Richard Feynman](https://en.wikipedia.org/wiki/Richard_Feynman)
 
-- [ ] Sampler class, provide __iter__() methode, return length of batches
+- [ ] Delete and Recreate the tinygrad solution in [examples/tensor.py](examples/tensor.py)
 
 - [ ] Tensor class / Automatic differentiation
     - [x] Simple derivatives with context (what created the next value / parent / operation)
@@ -48,6 +49,7 @@ if you want hardware optimization and lazyness we should use [tinygrad](https://
     - [ ] Ensure Type matching (dtype)
     - [ ] different type
 
+- [ ] Sampler class, provide __iter__() methode, return length of batches
 
 ## Details
 
@@ -60,7 +62,5 @@ the base for this project to work are 2 class:
         - return new Tensor based on forward
 - Tensor :
     - data : type[numpy array]
-    - gradient : type[Tensor]
+    - gradient : type[numpy array]
     - \_context : type[Function]/ops, takes \*parents tensors as arguments
-
-we have made an example in [Functionnement](examples/simple_function.py)
