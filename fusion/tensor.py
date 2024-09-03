@@ -1,12 +1,12 @@
 from __future__ import annotations
-import os
 
-from typing import Optional, Tuple, Type, Union
+import os
+from typing import Optional, Tuple, Type
 
 import numpy as np
+from numpy import dtype
 
 from fusion.graph import draw_graph
-from numpy import dtype
 
 
 class Function:
@@ -19,13 +19,9 @@ class Function:
     def backward(self, *args):
         raise RuntimeError("backward not implemented")
 
-    # @classmethod provides a way to define methods that operate on the class itself rather than instances of the class.
-    # The apply method is used to instantiate and execute the forward pass of the function, returning a tensor representing the result.
-    # context = Type[Function] that create this result: Add / Sum / Mul
     @classmethod
     def apply(cls: Type[Function], *parent: Tensor):
         context = cls(*parent)
-        # do i need parent or only the numpy array to create output ?
         output = Tensor(context.forward(*parent))
         output._context = context
         return output
