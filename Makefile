@@ -1,9 +1,10 @@
 ### Variables
-SYSTEM_PYTHON = /usr/bin/python3.11
+# SYSTEM_PYTHON = /usr/bin/python3.11
+# PYTHON = ${BIN}/python3.11
+# PIP = ${BIN}/pip
 VENV = .venv
 BIN = ${VENV}/bin
-PYTHON = ${BIN}/python3.11
-PIP = ${BIN}/pip
+PYTHON = ${BIN}/python
 ACTIVATE = ${BIN}/activate
 
 EXAMPLES_DIR = examples/
@@ -21,11 +22,12 @@ ARGUMENTS = ${DATASETS_DIR}${DATASET}
 setup: venv pip_upgrade install
 
 venv:
-	${SYSTEM_PYTHON} -m venv ${VENV}
+	# ${SYSTEM_PYTHON} -m venv ${VENV}
+	uv venv --python 3.12
 	ln -sf ${ACTIVATE} activate
 
 pip_upgrade:
-	${PIP} install --upgrade pip
+	uv pip install --upgrade pip
 
 install: \
 	module \
@@ -33,18 +35,15 @@ install: \
 
 #
 module: setup.py
-	${PIP} install -e '.' --upgrade
+	uv pip install -e '.' --upgrade
 
 requirements: requirements.txt
-	${PIP} install -r requirements.txt --upgrade
+	uv pip install -r requirements.txt --upgrade
 
 
 ### Info
 list:
-	${PIP} list
-
-version:
-	${PYTHON} --version
+	uv pip list
 
 size:
 	du -hd 0
@@ -61,7 +60,7 @@ run:
 
 ### Test
 test_module: setup setup.py
-	${PIP} install -e '.[testing]' --upgrade
+	uv pip install -e '.[testing]' --upgrade
 
 test:
 	${PYTHON} -m unittest discover test \
