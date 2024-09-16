@@ -1,5 +1,8 @@
+setuptools
 numpy
 tqdm
+# only need tinygrad for examples/tensor to compare
+tinygrad
 # ipython
 # requests
 

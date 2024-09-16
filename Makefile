@@ -1,7 +1,5 @@
 ### Variables
-# SYSTEM_PYTHON = /usr/bin/python3.11
-# PYTHON = ${BIN}/python3.11
-# PIP = ${BIN}/pip
+PYTHON_VERSION = 3.12
 VENV = .venv
 BIN = ${VENV}/bin
 PYTHON = ${BIN}/python
@@ -22,23 +20,22 @@ ARGUMENTS = ${DATASETS_DIR}${DATASET}
 setup: venv pip_upgrade install
 
 venv:
-	# ${SYSTEM_PYTHON} -m venv ${VENV}
-	uv venv --python 3.12
+	uv venv --python ${PYTHON_VERSION} ${VENV} --seed
 	ln -sf ${ACTIVATE} activate
 
 pip_upgrade:
 	uv pip install --upgrade pip
 
 install: \
-	module \
 	requirements \
+	module \
 
 #
-module: setup.py
-	uv pip install -e '.' --upgrade
-
 requirements: requirements.txt
 	uv pip install -r requirements.txt --upgrade
+
+module: setup.py
+	uv pip install -e '.' --upgrade
 
 
 ### Info
