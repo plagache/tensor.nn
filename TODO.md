@@ -25,7 +25,7 @@ I found the solution of [tinygrad](https://github.com/tinygrad/tinygrad) so eleg
 - [ ] Module DATA VIZ
     - [ ] Statistics / describe of data
     - [ ] Plot
-        - [ ] create a small website with dash or bokeh to plot things
+        - [ ] create a small website with [streamlit](https://github.com/streamlit/streamlit?tab=readme-ov-file)
 
 ## Others
 
