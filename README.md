@@ -5,7 +5,7 @@ Fusion is a machine learning library
 You need python, [uv](https://github.com/astral-sh/uv?tab=readme-ov-file#uv), make
 ```bash
 git clone https://github.com/plagache/fusion
-cd DSLR
+cd fusion
 make setup
 make run
 ```
