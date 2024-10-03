@@ -63,20 +63,37 @@ class Tensor:
 
     def topological_sort(self):
         def _topological_sort(node, unique, sorted):
-            print(node.data)
-            print(node._context.parents)
-            if self._context is not None:
-                unique.add(node)
-                if node not in sorted:
-                    sorted.append(node)
-                    _topological_sort(node, unique, sorted)
+            sorted.append(node)
+            if hasattr(node, "_context"):
+                for parent in node._context.parents:
+                    if parent not in unique:
+                        unique.add(parent)
+                    _topological_sort(parent, unique, sorted)
             return sorted
 
         return _topological_sort(self, set(), [])
 
     def backward(self):
+        self.gradient = Tensor(1)
+
         for node in reversed(self.topological_sort()):
-            print(f"node: {node}\n")
+            if hasattr(node, "_context"):
+                parents = node._context.parents
+                print(parents)
+                print(len(parents))
+                if len(parents) == 1:
+                    gradients = Tensor(parents._context.backward(node.gradient))
+                    print("grad data:", gradients.data)
+                else:
+                    for parent in parents:
+                        gradients = Tensor(parent._context.backward(node.gradient))
+                        print(gradients.data)
+                # gradients = parents._context.backward(node.gradient)
+                # gradient = Tensor(node._context.backward())
+                # gradient = Tensor(node.backward())
+                # print(f"gradient: {gradients}\n")
+                # print(f"gradient: {gradient}\n")
+                # print(f"node: {node.data}\n")
         return
 
     def mul(self, x):
@@ -128,9 +145,11 @@ class test_tensor(unittest.TestCase):
         # tiny_x_gradient = tiny_x.grad.numpy()
         # tiny_y_gradient = tiny_y.grad.numpy()
 
-        # print(mul.data, tiny_mul.numpy())
-        # print(add.data, tiny_add.numpy())
-        print(sum.data, tiny_sum.numpy())
+        print("\nx:", xt.data)
+        print("\ny:", yt.data)
+        print("\nmul result:", mul.data, tiny_mul.numpy())
+        print("\nadd result:", add.data, tiny_add.numpy())
+        print("\nsum result:", sum.data, tiny_sum.numpy())
         # print(type(sum.data), type(tiny_sum.numpy()))
         np.testing.assert_allclose(sum.data, tiny_sum.numpy())
         np.testing.assert_allclose(add.data, tiny_add.numpy())
